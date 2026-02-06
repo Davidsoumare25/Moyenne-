@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#00853f">
     <title>Calculateur Sénégal Pro</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         :root {
             --primary: #00853f; /* Vert Sénégal */
@@ -21,6 +27,7 @@
 
         .container { width: 100%; max-width: 500px; }
 
+        /* En-tête avec la moyenne */
         .header-card {
             background: linear-gradient(135deg, var(--primary), #005f2d);
             color: white; padding: 30px; border-radius: 25px;
@@ -31,6 +38,7 @@
         #moyenne-generale { font-size: 4rem; font-weight: 900; margin: 10px 0; color: var(--yellow); }
         #mention { font-weight: bold; font-size: 1.1rem; min-height: 1.5em; }
 
+        /* Lignes des matières */
         .subject-row {
             background: white; padding: 15px; border-radius: 15px;
             display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px;
@@ -39,15 +47,22 @@
             animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
 
         input {
             width: 100%; padding: 12px; border: 1px solid #e2e8f0;
             border-radius: 8px; font-size: 1rem; box-sizing: border-box;
+            outline: none;
         }
+
+        input:focus { border-color: var(--primary); }
 
         .label-style { font-size: 0.7rem; color: #64748b; font-weight: bold; margin-bottom: 5px; display: block; }
 
+        /* Boutons */
         .btn-calc {
             width: 100%; padding: 20px; background: var(--primary);
             color: white; border: none; border-radius: 15px;
@@ -55,7 +70,7 @@
             margin: 10px 0; box-shadow: 0 4px 12px rgba(0, 133, 63, 0.3);
         }
 
-        .btn-calc:active { transform: scale(0.98); }
+        .btn-calc:active { transform: scale(0.98); background: #006b33; }
 
         .add-btn {
             background: #e2e8f0; border: none; padding: 12px;
@@ -67,6 +82,8 @@
             background: #fee2e2; color: var(--accent); border: none;
             border-radius: 8px; padding: 12px 10px; cursor: pointer; font-weight: bold;
         }
+
+        #info-calcul { font-size: 0.8rem; margin-top: 10px; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -76,7 +93,7 @@
         <span style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;">Moyenne Semestrielle</span>
         <div id="moyenne-generale">--</div>
         <div id="mention"></div>
-        <div id="info-calcul" style="font-size: 0.8rem; margin-top: 10px; opacity: 0.8;"></div>
+        <div id="info-calcul">Entrez vos notes</div>
     </div>
 
     <div id="liste-matieres">
@@ -87,23 +104,27 @@
 </div>
 
 <script>
-    // Charger les données sauvegardées ou créer une ligne vide
-    let matieresSaisies = JSON.parse(localStorage.getItem('notesSaved')) || [{nom:'', coef:'', note:''}];
+    /** * SAUVEGARDE & CHARGEMENT 
+     **/
+    let matieresSaisies = JSON.parse(localStorage.getItem('notesSaved')) || [
+        {nom: 'Mathématiques', coef: '5', note: ''},
+        {nom: 'Français', coef: '5', note: ''}
+    ];
 
     function initialiser() {
         const container = document.getElementById('liste-matieres');
         container.innerHTML = '';
-        matieresSaisies.forEach((m, index) => creerLigne(m, index));
+        matieresSaisies.forEach((m, index) => creerLigne(m));
     }
 
-    function creerLigne(data = {nom:'', coef:'', note:''}, index) {
+    function creerLigne(data = {nom:'', coef:'', note:''}) {
         const container = document.getElementById('liste-matieres');
         const div = document.createElement('div');
         div.className = 'subject-row';
         div.innerHTML = `
-            <div><span class="label-style">MATIÈRE</span><input type="text" value="${data.nom}" placeholder="Ex: Math" class="m-name" onchange="sauvegarder()"></div>
-            <div><span class="label-style">COEF</span><input type="number" value="${data.coef}" placeholder="1" class="m-coef" onchange="sauvegarder()"></div>
-            <div><span class="label-style">NOTE</span><input type="number" value="${data.note}" step="0.01" placeholder="/20" class="m-note" onchange="sauvegarder()"></div>
+            <div><span class="label-style">MATIÈRE</span><input type="text" value="${data.nom}" placeholder="Nom" class="m-name" oninput="sauvegarder()"></div>
+            <div><span class="label-style">COEF</span><input type="number" value="${data.coef}" placeholder="1" class="m-coef" oninput="sauvegarder()"></div>
+            <div><span class="label-style">NOTE</span><input type="number" value="${data.note}" step="0.01" placeholder="/20" class="m-note" oninput="sauvegarder()"></div>
             <button class="del-btn" onclick="supprimerLigne(this)">✕</button>
         `;
         container.appendChild(div);
@@ -117,7 +138,6 @@
     function supprimerLigne(btn) {
         btn.parentElement.remove();
         sauvegarder();
-        calculerMoyenne();
     }
 
     function sauvegarder() {
@@ -133,6 +153,8 @@
         localStorage.setItem('notesSaved', JSON.stringify(currentData));
     }
 
+    /** * LOGIQUE DE CALCUL EXACT 
+     **/
     function calculerMoyenne() {
         const coefs = document.querySelectorAll('.m-coef');
         const notes = document.querySelectorAll('.m-note');
@@ -141,6 +163,8 @@
         for (let i = 0; i < notes.length; i++) {
             const n = parseFloat(notes[i].value);
             const c = parseFloat(coefs[i].value);
+            
+            // Calcul exact : Note x Coefficient
             if (!isNaN(n) && !isNaN(c) && c > 0) {
                 cumulPoints += (n * c);
                 totalCoef += c;
@@ -155,19 +179,26 @@
         if (totalCoef > 0) {
             const moyenne = cumulPoints / totalCoef;
             res.textContent = moyenne.toFixed(2);
-            inf.textContent = `Calcul sur ${count} matières (Total Coeff: ${totalCoef})`;
+            inf.textContent = `Basé sur ${count} matière(s) • Total Coef: ${totalCoef}`;
             
-            if (moyenne >= 16) men.textContent = "Excellent ! 🌟";
-            else if (moyenne >= 14) men.textContent = "Très Bien ! 👍";
-            else if (moyenne >= 12) men.textContent = "Assez Bien ✅";
-            else if (moyenne >= 10) men.textContent = "Passable 📝";
-            else men.textContent = "Encouragements ! 💪";
+            // Mentions sénégalaises
+            if (moyenne >= 16) men.textContent = "Mention Très Bien 🌟";
+            else if (moyenne >= 14) men.textContent = "Mention Bien ⭐";
+            else if (moyenne >= 12) men.textContent = "Mention Assez-Bien ✅";
+            else if (moyenne >= 10) men.textContent = "Passable 👍";
+            else men.textContent = "Encouragements 💪";
         } else {
-            res.textContent = "--";
-            men.textContent = "";
-            inf.textContent = "Remplissez les notes et les coefficients";
+            alert("Veuillez entrer au moins une note et un coefficient !");
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /** * ACTIVATION PWA 
+     **/
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW non enregistré', err));
+        });
     }
 
     initialiser();
