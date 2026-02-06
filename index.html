@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#00853f">
     <title>Calculateur Sénégal Pro</title>
-    
     <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <style>
         :root {
-            --primary: #00853f; /* Vert Sénégal */
-            --accent: #e31b23;  /* Rouge Sénégal */
+            --primary: #00853f;
+            --accent: #e31b23;
             --yellow: #fdef42;
             --bg: #f8fafc;
         }
@@ -25,125 +21,128 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        .container { width: 100%; max-width: 500px; }
+        .container { width: 100%; max-width: 500px; padding-bottom: 50px; }
 
-        /* En-tête avec la moyenne */
+        /* Header & Actions */
+        .top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .icon-btn {
+            background: white; border: none; border-radius: 50%;
+            width: 40px; height: 40px; font-size: 1.2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer;
+        }
+
         .header-card {
             background: linear-gradient(135deg, var(--primary), #005f2d);
             color: white; padding: 30px; border-radius: 25px;
             text-align: center; margin-bottom: 20px;
             box-shadow: 0 10px 20px rgba(0, 133, 63, 0.2);
+            position: relative;
         }
 
         #moyenne-generale { font-size: 4rem; font-weight: 900; margin: 10px 0; color: var(--yellow); }
-        #mention { font-weight: bold; font-size: 1.1rem; min-height: 1.5em; }
 
-        /* Lignes des matières */
+        /* Lignes Matières */
         .subject-row {
             background: white; padding: 15px; border-radius: 15px;
             display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px;
             margin-bottom: 10px; align-items: end;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
         }
 
         input {
             width: 100%; padding: 12px; border: 1px solid #e2e8f0;
             border-radius: 8px; font-size: 1rem; box-sizing: border-box;
-            outline: none;
         }
 
-        input:focus { border-color: var(--primary); }
-
-        .label-style { font-size: 0.7rem; color: #64748b; font-weight: bold; margin-bottom: 5px; display: block; }
-
-        /* Boutons */
         .btn-calc {
             width: 100%; padding: 20px; background: var(--primary);
             color: white; border: none; border-radius: 15px;
-            font-size: 1.2rem; font-weight: bold; cursor: pointer;
-            margin: 10px 0; box-shadow: 0 4px 12px rgba(0, 133, 63, 0.3);
+            font-size: 1.2rem; font-weight: bold; margin: 15px 0;
         }
 
-        .btn-calc:active { transform: scale(0.98); background: #006b33; }
-
-        .add-btn {
-            background: #e2e8f0; border: none; padding: 12px;
-            border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold;
-            margin-bottom: 10px; color: #475569;
+        /* Panneau Historique (Caché par défaut) */
+        #history-panel {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 100; padding: 20px; box-sizing: border-box;
+            overflow-y: auto;
         }
 
-        .del-btn {
-            background: #fee2e2; color: var(--accent); border: none;
-            border-radius: 8px; padding: 12px 10px; cursor: pointer; font-weight: bold;
+        .history-item {
+            border-bottom: 1px solid #eee; padding: 15px 0;
+            display: flex; justify-content: space-between;
         }
 
-        #info-calcul { font-size: 0.8rem; margin-top: 10px; opacity: 0.8; }
+        /* Footer Signature */
+        .footer-name {
+            margin-top: 30px; font-size: 0.75rem; color: #94a3b8;
+            text-align: center; font-style: italic;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-card">
-        <span style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;">Moyenne Semestrielle</span>
-        <div id="moyenne-generale">--</div>
-        <div id="mention"></div>
-        <div id="info-calcul">Entrez vos notes</div>
+    <div class="top-bar">
+        <button class="icon-btn" onclick="shareApp()">📤</button>
+        <button class="icon-btn" onclick="toggleHistory()">🕒</button>
     </div>
 
-    <div id="liste-matieres">
-        </div>
+    <div class="header-card">
+        <span style="font-size: 0.8rem; opacity: 0.9;">MOYENNE SEMESTRIELLE</span>
+        <div id="moyenne-generale">--</div>
+        <div id="mention"></div>
+    </div>
 
-    <button class="add-btn" onclick="ajouterLigne()">+ Ajouter une matière</button>
+    <div id="liste-matieres"></div>
+
+    <button class="icon-btn" style="width:100%; border-radius:10px; margin-bottom:10px;" onclick="ajouterLigne()">+ Ajouter une matière</button>
     <button class="btn-calc" onclick="calculerMoyenne()">CALCULER LA MOYENNE</button>
+
+    <div class="footer-name">Daouda Soumaré</div>
+</div>
+
+<div id="history-panel">
+    <div style="display:flex; justify-content: space-between; align-items: center;">
+        <h2>Historique</h2>
+        <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.5rem;">✕</button>
+    </div>
+    <div id="history-content">Aucune moyenne enregistrée.</div>
+    <button onclick="clearHistory()" style="color:red; border:none; background:none; margin-top:20px;">Effacer l'historique</button>
 </div>
 
 <script>
-    /** * SAUVEGARDE & CHARGEMENT 
-     **/
-    let matieresSaisies = JSON.parse(localStorage.getItem('notesSaved')) || [
-        {nom: 'Mathématiques', coef: '5', note: ''},
-        {nom: 'Français', coef: '5', note: ''}
-    ];
+    let matieresSaisies = JSON.parse(localStorage.getItem('notesSaved')) || [{nom:'', coef:'', note:''}];
+    let historique = JSON.parse(localStorage.getItem('moyenneHistory')) || [];
 
     function initialiser() {
         const container = document.getElementById('liste-matieres');
         container.innerHTML = '';
-        matieresSaisies.forEach((m, index) => creerLigne(m));
+        matieresSaisies.forEach(m => creerLigne(m));
     }
 
-    function creerLigne(data = {nom:'', coef:'', note:''}) {
-        const container = document.getElementById('liste-matieres');
+    function creerLigne(data) {
         const div = document.createElement('div');
         div.className = 'subject-row';
         div.innerHTML = `
-            <div><span class="label-style">MATIÈRE</span><input type="text" value="${data.nom}" placeholder="Nom" class="m-name" oninput="sauvegarder()"></div>
-            <div><span class="label-style">COEF</span><input type="number" value="${data.coef}" placeholder="1" class="m-coef" oninput="sauvegarder()"></div>
-            <div><span class="label-style">NOTE</span><input type="number" value="${data.note}" step="0.01" placeholder="/20" class="m-note" oninput="sauvegarder()"></div>
-            <button class="del-btn" onclick="supprimerLigne(this)">✕</button>
+            <div><input type="text" value="${data.nom}" placeholder="Matière" class="m-name" onchange="sauvegarder()"></div>
+            <div><input type="number" value="${data.coef}" placeholder="Coef" class="m-coef" onchange="sauvegarder()"></div>
+            <div><input type="number" value="${data.note}" step="0.01" placeholder="Note" class="m-note" onchange="sauvegarder()"></div>
+            <button onclick="this.parentElement.remove(); sauvegarder();" style="border:none; background:none; color:red;">✕</button>
         `;
-        container.appendChild(div);
+        document.getElementById('liste-matieres').appendChild(div);
     }
 
-    function ajouterLigne() {
-        creerLigne();
-        sauvegarder();
-    }
-
-    function supprimerLigne(btn) {
-        btn.parentElement.remove();
-        sauvegarder();
-    }
+    function ajouterLigne() { creerLigne({nom:'', coef:'', note:''}); sauvegarder(); }
 
     function sauvegarder() {
-        const rows = document.querySelectorAll('.subject-row');
         let currentData = [];
-        rows.forEach(row => {
+        document.querySelectorAll('.subject-row').forEach(row => {
             currentData.push({
                 nom: row.querySelector('.m-name').value,
                 coef: row.querySelector('.m-coef').value,
@@ -153,52 +152,57 @@
         localStorage.setItem('notesSaved', JSON.stringify(currentData));
     }
 
-    /** * LOGIQUE DE CALCUL EXACT 
-     **/
     function calculerMoyenne() {
         const coefs = document.querySelectorAll('.m-coef');
         const notes = document.querySelectorAll('.m-note');
-        let cumulPoints = 0, totalCoef = 0, count = 0;
+        let cumulPoints = 0, totalCoef = 0;
 
-        for (let i = 0; i < notes.length; i++) {
-            const n = parseFloat(notes[i].value);
+        notes.forEach((nInput, i) => {
+            const n = parseFloat(nInput.value);
             const c = parseFloat(coefs[i].value);
-            
-            // Calcul exact : Note x Coefficient
-            if (!isNaN(n) && !isNaN(c) && c > 0) {
-                cumulPoints += (n * c);
-                totalCoef += c;
-                count++;
-            }
-        }
-
-        const res = document.getElementById('moyenne-generale');
-        const men = document.getElementById('mention');
-        const inf = document.getElementById('info-calcul');
+            if (!isNaN(n) && !isNaN(c)) { cumulPoints += (n * c); totalCoef += c; }
+        });
 
         if (totalCoef > 0) {
-            const moyenne = cumulPoints / totalCoef;
-            res.textContent = moyenne.toFixed(2);
-            inf.textContent = `Basé sur ${count} matière(s) • Total Coef: ${totalCoef}`;
+            const moy = (cumulPoints / totalCoef).toFixed(2);
+            document.getElementById('moyenne-generale').textContent = moy;
             
-            // Mentions sénégalaises
-            if (moyenne >= 16) men.textContent = "Mention Très Bien 🌟";
-            else if (moyenne >= 14) men.textContent = "Mention Bien ⭐";
-            else if (moyenne >= 12) men.textContent = "Mention Assez-Bien ✅";
-            else if (moyenne >= 10) men.textContent = "Passable 👍";
-            else men.textContent = "Encouragements 💪";
-        } else {
-            alert("Veuillez entrer au moins une note et un coefficient !");
+            // Enregistrer dans l'historique
+            const date = new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            historique.unshift({ moy, date });
+            localStorage.setItem('moyenneHistory', JSON.stringify(historique));
+            updateHistoryUI();
         }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /** * ACTIVATION PWA 
-     **/
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW non enregistré', err));
-        });
+    function toggleHistory() {
+        const panel = document.getElementById('history-panel');
+        panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+        updateHistoryUI();
+    }
+
+    function updateHistoryUI() {
+        const content = document.getElementById('history-content');
+        if (historique.length === 0) return;
+        content.innerHTML = historique.map(h => `
+            <div class="history-item">
+                <span>Moyenne: <b>${h.moy}</b></span>
+                <span style="color:#666; font-size:0.8rem;">${h.date}</span>
+            </div>
+        `).join('');
+    }
+
+    function clearHistory() { 
+        if(confirm("Effacer ?")) { historique = []; localStorage.removeItem('moyenneHistory'); updateHistoryUI(); }
+    }
+
+    async function shareApp() {
+        const shareData = {
+            title: 'Calculateur Sénégal Pro',
+            text: 'Calcule ta moyenne facilement avec cette app !',
+            url: window.location.href
+        };
+        try { await navigator.share(shareData); } catch(err) { console.log("Erreur partage"); }
     }
 
     initialiser();
