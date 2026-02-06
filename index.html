@@ -23,7 +23,6 @@
 
         .container { width: 100%; max-width: 500px; padding-bottom: 60px; min-height: 100vh; position: relative; }
 
-        /* Barre d'outils du haut */
         .top-tools {
             width: 100%;
             display: flex;
@@ -66,7 +65,6 @@
             box-shadow: 0 4px 12px rgba(0,133,63,0.3);
         }
 
-        /* Panneau Historique */
         #history-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
@@ -82,10 +80,9 @@
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* Signature Daouda */
         .signature {
             text-align: center; font-size: 0.8rem; color: #94a3b8;
-            margin-top: 40px; font-weight: 500; letter-spacing: 0.5px;
+            margin-top: 40px; font-weight: 500;
         }
     </style>
 </head>
@@ -93,8 +90,8 @@
 
 <div class="container">
     <div class="top-tools">
-        <button class="tool-btn" onclick="shareApp()" title="Partager">📤</button>
-        <button class="tool-btn" onclick="toggleHistory()" title="Historique">🕒</button>
+        <button class="tool-btn" onclick="shareApp()">📤</button>
+        <button class="tool-btn" onclick="toggleHistory()">🕒</button>
     </div>
 
     <div class="header-card">
@@ -174,10 +171,9 @@
             const moy = (pts / totalC).toFixed(2);
             document.getElementById('moyenne-generale').textContent = moy;
             
-            // Sauvegarde historique
             const entree = { score: moy, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) };
             historique.unshift(entree);
-            if(historique.length > 10) historique.pop(); // Garder les 10 derniers
+            if(historique.length > 10) historique.pop();
             localStorage.setItem('moyenneHistory', JSON.stringify(historique));
         }
     }
@@ -186,7 +182,6 @@
         const modal = document.getElementById('history-modal');
         const list = document.getElementById('history-list');
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-        
         list.innerHTML = historique.length ? historique.map(h => `
             <div class="history-entry">
                 <span>Moyenne : <b>${h.score}</b></span>
@@ -195,14 +190,14 @@
         `).join('') : '<p style="text-align:center; color:#888">Aucun historique</p>';
     }
 
-    function effacerTout() { if(confirm("Effacer l'historique ?")) { historique = []; localStorage.setItem('moyenneHistory', '[]'); toggleHistory(); } }
+    function effacerTout() { if(confirm("Effacer ?")) { historique = []; localStorage.setItem('moyenneHistory', '[]'); toggleHistory(); } }
 
     async function shareApp() {
         if (navigator.share) {
             try {
-                await navigator.share({ title: 'Calculateur Sénégal Pro', text: 'Calcule ta moyenne facilement avec l\'app de Daouda !', url: window.location.href });
-            } catch (err) { console.log("Erreur de partage"); }
-        } else { alert("Lien de l'app : " + window.location.href); }
+                await navigator.share({ title: 'Calculateur Sénégal Pro', text: 'Calcule ta moyenne avec l\'app de Daouda !', url: window.location.href });
+            } catch (err) { console.log("Erreur"); }
+        } else { alert("Lien : " + window.location.href); }
     }
 
     initialiser();
