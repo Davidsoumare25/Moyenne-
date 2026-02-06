@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculateur Sénégal Pro</title>
+    <style>
+        :root {
+            --primary: #00853f; /* Vert Sénégal */
+            --accent: #e31b23;  /* Rouge Sénégal */
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            margin: 0; padding: 15px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .container { width: 100%; max-width: 500px; }
+
+        .header-card {
+            background: linear-gradient(135deg, var(--primary), #005f2d);
+            color: white; padding: 30px; border-radius: 25px;
+            text-align: center; margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0, 133, 63, 0.2);
+        }
+
+        #moyenne-generale { font-size: 4rem; font-weight: 900; margin: 10px 0; color: #fdef42; }
+
+        .subject-row {
+            background: white; padding: 15px; border-radius: 15px;
+            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px;
+            margin-bottom: 10px; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        input {
+            width: 100%; padding: 12px; border: 1px solid #e2e8f0;
+            border-radius: 8px; font-size: 1rem; box-sizing: border-box;
+        }
+
+        .label-style { font-size: 0.7rem; color: #64748b; font-weight: bold; margin-bottom: 5px; display: block; }
+
+        .btn-calc {
+            width: 100%; padding: 20px; background: var(--primary);
+            color: white; border: none; border-radius: 15px;
+            font-size: 1.2rem; font-weight: bold; cursor: pointer;
+            margin: 20px 0; box-shadow: 0 4px 12px rgba(0, 133, 63, 0.3);
+        }
+
+        .btn-calc:active { transform: scale(0.98); background: var(--accent); }
+
+        .add-btn {
+            background: #e2e8f0; border: none; padding: 10px;
+            border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-card">
+        <span style="text-transform: uppercase; letter-spacing: 1px;">Moyenne Semestrielle</span>
+        <div id="moyenne-generale">--</div>
+        <div id="info-calcul">Entrez vos notes et coeffs</div>
+    </div>
+
+    <div id="liste-matieres">
+        <div class="subject-row">
+            <div><span class="label-style">MATIÈRE</span><input type="text" placeholder="Ex: Maths" class="m-name"></div>
+            <div><span class="label-style">COEF</span><input type="number" step="1" placeholder="1" class="m-coef"></div>
+            <div><span class="label-style">NOTE</span><input type="number" step="0.01" placeholder="/20" class="m-note"></div>
+        </div>
+    </div>
+
+    <button class="add-btn" onclick="ajouterLigne()">+ Ajouter une matière</button>
+    <button class="btn-calc" onclick="calculerMoyenne()">CALCULER LA MOYENNE</button>
+</div>
+
+<script>
+    function ajouterLigne() {
+        const container = document.getElementById('liste-matieres');
+        const div = document.createElement('div');
+        div.className = 'subject-row';
+        div.innerHTML = `
+            <div><input type="text" placeholder="Matière" class="m-name"></div>
+            <div><input type="number" step="1" placeholder="Coef" class="m-coef"></div>
+            <div><input type="number" step="0.01" placeholder="Note" class="m-note"></div>
+        `;
+        container.appendChild(div);
+    }
+
+    function calculerMoyenne() {
+        const coefs = document.querySelectorAll('.m-coef');
+        const notes = document.querySelectorAll('.m-note');
+
+        let cumulPointsPonderes = 0;
+        let totalCoefficients = 0;
+        let valide = 0;
+
+        for (let i = 0; i < notes.length; i++) {
+            const n = parseFloat(notes[i].value);
+            const c = parseFloat(coefs[i].value);
+
+            // Vérification stricte : on n'ajoute que si la note ET le coef sont des nombres valides
+            if (!isNaN(n) && !isNaN(c) && c > 0) {
+                cumulPointsPonderes += (n * c);
+                totalCoefficients += c;
+                valide++;
+            }
+        }
+
+        const resultatDisplay = document.getElementById('moyenne-generale');
+        const infoDisplay = document.getElementById('info-calcul');
+
+        if (totalCoefficients > 0) {
+            // Formule : Somme(Note * Coeff) / Somme(Coeffs)
+            const moyenneFinale = cumulPointsPonderes / totalCoefficients;
+            
+            // Affichage avec 2 décimales exactes
+            resultatDisplay.textContent = moyenneFinale.toFixed(2);
+            infoDisplay.textContent = `Calcul sur ${valide} matières (Total Coeff: ${totalCoefficients})`;
+        } else {
+            alert("Erreur : Assurez-vous d'avoir rempli au moins une note et son coefficient (supérieur à 0).");
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
+
