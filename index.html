@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#00853f">
-    <title>Calculateur de moyenne</title>
+    <title>Calculateur Sénégal Pro</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
@@ -21,20 +21,21 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        .container { width: 100%; max-width: 500px; padding-bottom: 50px; }
+        .container { width: 100%; max-width: 500px; padding-bottom: 60px; min-height: 100vh; position: relative; }
 
-        /* Header & Actions */
-        .top-bar {
+        /* Barre d'outils du haut */
+        .top-tools {
             width: 100%;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
-        .icon-btn {
-            background: white; border: none; border-radius: 50%;
-            width: 40px; height: 40px; font-size: 1.2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer;
+        .tool-btn {
+            background: white; border: none; border-radius: 12px;
+            width: 45px; height: 45px; font-size: 1.2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .header-card {
@@ -42,167 +43,166 @@
             color: white; padding: 30px; border-radius: 25px;
             text-align: center; margin-bottom: 20px;
             box-shadow: 0 10px 20px rgba(0, 133, 63, 0.2);
-            position: relative;
         }
 
         #moyenne-generale { font-size: 4rem; font-weight: 900; margin: 10px 0; color: var(--yellow); }
 
-        /* Lignes Matières */
         .subject-row {
-            background: white; padding: 15px; border-radius: 15px;
+            background: white; padding: 15px; border-radius: 18px;
             display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px;
-            margin-bottom: 10px; align-items: end;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 12px; align-items: end;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         input {
             width: 100%; padding: 12px; border: 1px solid #e2e8f0;
-            border-radius: 8px; font-size: 1rem; box-sizing: border-box;
+            border-radius: 10px; font-size: 1rem; box-sizing: border-box;
         }
 
         .btn-calc {
             width: 100%; padding: 20px; background: var(--primary);
-            color: white; border: none; border-radius: 15px;
+            color: white; border: none; border-radius: 18px;
             font-size: 1.2rem; font-weight: bold; margin: 15px 0;
+            box-shadow: 0 4px 12px rgba(0,133,63,0.3);
         }
 
-        /* Panneau Historique (Caché par défaut) */
-        #history-panel {
+        /* Panneau Historique */
+        #history-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 100; padding: 20px; box-sizing: border-box;
-            overflow-y: auto;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
         }
 
-        .history-item {
-            border-bottom: 1px solid #eee; padding: 15px 0;
-            display: flex; justify-content: space-between;
+        .modal-content {
+            background: white; width: 90%; max-width: 400px; padding: 25px;
+            border-radius: 25px; max-height: 70vh; overflow-y: auto;
         }
 
-        /* Footer Signature */
-        .footer-name {
-            margin-top: 30px; font-size: 0.75rem; color: #94a3b8;
-            text-align: center; font-style: italic;
+        .history-entry {
+            padding: 12px 0; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* Signature Daouda */
+        .signature {
+            text-align: center; font-size: 0.8rem; color: #94a3b8;
+            margin-top: 40px; font-weight: 500; letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="top-bar">
-        <button class="icon-btn" onclick="shareApp()">📤</button>
-        <button class="icon-btn" onclick="toggleHistory()">🕒</button>
+    <div class="top-tools">
+        <button class="tool-btn" onclick="shareApp()" title="Partager">📤</button>
+        <button class="tool-btn" onclick="toggleHistory()" title="Historique">🕒</button>
     </div>
 
     <div class="header-card">
-        <span style="font-size: 0.8rem; opacity: 0.9;">MOYENNE SEMESTRIELLE</span>
+        <span style="font-size: 0.8rem; letter-spacing: 1px;">MOYENNE SEMESTRIELLE</span>
         <div id="moyenne-generale">--</div>
-        <div id="mention"></div>
+        <div id="mention" style="font-weight: bold;"></div>
     </div>
 
     <div id="liste-matieres"></div>
 
-    <button class="icon-btn" style="width:100%; border-radius:10px; margin-bottom:10px;" onclick="ajouterLigne()">+ Ajouter une matière</button>
+    <button class="tool-btn" style="width:100%; border-radius:15px; margin-top:10px; font-size: 0.9rem;" onclick="ajouterLigne()">+ Ajouter une matière</button>
+    
     <button class="btn-calc" onclick="calculerMoyenne()">CALCULER LA MOYENNE</button>
 
-    <div class="footer-name">Daouda Soumaré</div>
+    <div class="signature">Développé par Daouda Soumaré</div>
 </div>
 
-<div id="history-panel">
-    <div style="display:flex; justify-content: space-between; align-items: center;">
-        <h2>Historique</h2>
-        <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.5rem;">✕</button>
+<div id="history-modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <h3 style="margin:0">Historique</h3>
+            <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.2rem;">✕</button>
+        </div>
+        <div id="history-list"></div>
+        <button onclick="effacerTout()" style="width:100%; margin-top:20px; border:none; color:var(--accent); background:none; font-size:0.8rem;">Vider l'historique</button>
     </div>
-    <div id="history-content">Aucune moyenne enregistrée.</div>
-    <button onclick="clearHistory()" style="color:red; border:none; background:none; margin-top:20px;">Effacer l'historique</button>
 </div>
 
 <script>
-    let matieresSaisies = JSON.parse(localStorage.getItem('notesSaved')) || [{nom:'', coef:'', note:''}];
+    let matieres = JSON.parse(localStorage.getItem('notesSaved')) || [{nom:'', coef:'', note:''}];
     let historique = JSON.parse(localStorage.getItem('moyenneHistory')) || [];
 
     function initialiser() {
-        const container = document.getElementById('liste-matieres');
-        container.innerHTML = '';
-        matieresSaisies.forEach(m => creerLigne(m));
+        const list = document.getElementById('liste-matieres');
+        list.innerHTML = '';
+        matieres.forEach(m => creerLigne(m));
     }
 
     function creerLigne(data) {
         const div = document.createElement('div');
         div.className = 'subject-row';
         div.innerHTML = `
-            <div><input type="text" value="${data.nom}" placeholder="Matière" class="m-name" onchange="sauvegarder()"></div>
-            <div><input type="number" value="${data.coef}" placeholder="Coef" class="m-coef" onchange="sauvegarder()"></div>
-            <div><input type="number" value="${data.note}" step="0.01" placeholder="Note" class="m-note" onchange="sauvegarder()"></div>
-            <button onclick="this.parentElement.remove(); sauvegarder();" style="border:none; background:none; color:red;">✕</button>
+            <div><input type="text" value="${data.nom}" placeholder="Nom" class="m-name" oninput="sauver()"></div>
+            <div><input type="number" value="${data.coef}" placeholder="Coef" class="m-coef" oninput="sauver()"></div>
+            <div><input type="number" value="${data.note}" step="0.01" placeholder="Note" class="m-note" oninput="sauver()"></div>
+            <button onclick="this.parentElement.remove(); sauver();" style="border:none; background:none; color:var(--accent); font-weight:bold;">✕</button>
         `;
         document.getElementById('liste-matieres').appendChild(div);
     }
 
-    function ajouterLigne() { creerLigne({nom:'', coef:'', note:''}); sauvegarder(); }
+    function ajouterLigne() { creerLigne({nom:'', coef:'', note:''}); sauver(); }
 
-    function sauvegarder() {
-        let currentData = [];
+    function sauver() {
+        let data = [];
         document.querySelectorAll('.subject-row').forEach(row => {
-            currentData.push({
+            data.push({
                 nom: row.querySelector('.m-name').value,
                 coef: row.querySelector('.m-coef').value,
                 note: row.querySelector('.m-note').value
             });
         });
-        localStorage.setItem('notesSaved', JSON.stringify(currentData));
+        localStorage.setItem('notesSaved', JSON.stringify(data));
     }
 
     function calculerMoyenne() {
         const coefs = document.querySelectorAll('.m-coef');
         const notes = document.querySelectorAll('.m-note');
-        let cumulPoints = 0, totalCoef = 0;
+        let pts = 0, totalC = 0;
 
-        notes.forEach((nInput, i) => {
-            const n = parseFloat(nInput.value);
-            const c = parseFloat(coefs[i].value);
-            if (!isNaN(n) && !isNaN(c)) { cumulPoints += (n * c); totalCoef += c; }
+        notes.forEach((n, i) => {
+            const valN = parseFloat(n.value);
+            const valC = parseFloat(coefs[i].value);
+            if (!isNaN(valN) && !isNaN(valC)) { pts += (valN * valC); totalC += valC; }
         });
 
-        if (totalCoef > 0) {
-            const moy = (cumulPoints / totalCoef).toFixed(2);
+        if (totalC > 0) {
+            const moy = (pts / totalC).toFixed(2);
             document.getElementById('moyenne-generale').textContent = moy;
             
-            // Enregistrer dans l'historique
-            const date = new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-            historique.unshift({ moy, date });
+            // Sauvegarde historique
+            const entree = { score: moy, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) };
+            historique.unshift(entree);
+            if(historique.length > 10) historique.pop(); // Garder les 10 derniers
             localStorage.setItem('moyenneHistory', JSON.stringify(historique));
-            updateHistoryUI();
         }
     }
 
     function toggleHistory() {
-        const panel = document.getElementById('history-panel');
-        panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
-        updateHistoryUI();
-    }
-
-    function updateHistoryUI() {
-        const content = document.getElementById('history-content');
-        if (historique.length === 0) return;
-        content.innerHTML = historique.map(h => `
-            <div class="history-item">
-                <span>Moyenne: <b>${h.moy}</b></span>
-                <span style="color:#666; font-size:0.8rem;">${h.date}</span>
+        const modal = document.getElementById('history-modal');
+        const list = document.getElementById('history-list');
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        
+        list.innerHTML = historique.length ? historique.map(h => `
+            <div class="history-entry">
+                <span>Moyenne : <b>${h.score}</b></span>
+                <span style="font-size:0.7rem; color:#888">${h.date}</span>
             </div>
-        `).join('');
+        `).join('') : '<p style="text-align:center; color:#888">Aucun historique</p>';
     }
 
-    function clearHistory() { 
-        if(confirm("Effacer ?")) { historique = []; localStorage.removeItem('moyenneHistory'); updateHistoryUI(); }
-    }
+    function effacerTout() { if(confirm("Effacer l'historique ?")) { historique = []; localStorage.setItem('moyenneHistory', '[]'); toggleHistory(); } }
 
     async function shareApp() {
-        const shareData = {
-            title: 'Calculateur Sénégal Pro',
-            text: 'Calcule ta moyenne facilement avec cette app !',
-            url: window.location.href
-        };
-        try { await navigator.share(shareData); } catch(err) { console.log("Erreur partage"); }
+        if (navigator.share) {
+            try {
+                await navigator.share({ title: 'Calculateur Sénégal Pro', text: 'Calcule ta moyenne facilement avec l\'app de Daouda !', url: window.location.href });
+            } catch (err) { console.log("Erreur de partage"); }
+        } else { alert("Lien de l'app : " + window.location.href); }
     }
 
     initialiser();
