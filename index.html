@@ -8,6 +8,7 @@
         :root {
             --primary: #00853f; /* Vert Sénégal */
             --accent: #e31b23;  /* Rouge Sénégal */
+            --yellow: #fdef42;
             --bg: #f8fafc;
         }
 
@@ -27,14 +28,18 @@
             box-shadow: 0 10px 20px rgba(0, 133, 63, 0.2);
         }
 
-        #moyenne-generale { font-size: 4rem; font-weight: 900; margin: 10px 0; color: #fdef42; }
+        #moyenne-generale { font-size: 4rem; font-weight: 900; margin: 10px 0; color: var(--yellow); }
+        #mention { font-weight: bold; font-size: 1.1rem; min-height: 1.5em; }
 
         .subject-row {
             background: white; padding: 15px; border-radius: 15px;
-            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px;
-            margin-bottom: 10px; align-items: center;
+            display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px;
+            margin-bottom: 10px; align-items: end;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            animation: slideIn 0.3s ease-out;
         }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         input {
             width: 100%; padding: 12px; border: 1px solid #e2e8f0;
@@ -47,15 +52,20 @@
             width: 100%; padding: 20px; background: var(--primary);
             color: white; border: none; border-radius: 15px;
             font-size: 1.2rem; font-weight: bold; cursor: pointer;
-            margin: 20px 0; box-shadow: 0 4px 12px rgba(0, 133, 63, 0.3);
+            margin: 10px 0; box-shadow: 0 4px 12px rgba(0, 133, 63, 0.3);
         }
 
-        .btn-calc:active { transform: scale(0.98); background: var(--accent); }
+        .btn-calc:active { transform: scale(0.98); }
 
         .add-btn {
-            background: #e2e8f0; border: none; padding: 10px;
+            background: #e2e8f0; border: none; padding: 12px;
             border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 10px; color: #475569;
+        }
+
+        .del-btn {
+            background: #fee2e2; color: var(--accent); border: none;
+            border-radius: 8px; padding: 12px 10px; cursor: pointer; font-weight: bold;
         }
     </style>
 </head>
@@ -63,74 +73,105 @@
 
 <div class="container">
     <div class="header-card">
-        <span style="text-transform: uppercase; letter-spacing: 1px;">Moyenne Semestrielle</span>
+        <span style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;">Moyenne Semestrielle</span>
         <div id="moyenne-generale">--</div>
-        <div id="info-calcul">Entrez vos notes et coeffs</div>
+        <div id="mention"></div>
+        <div id="info-calcul" style="font-size: 0.8rem; margin-top: 10px; opacity: 0.8;"></div>
     </div>
 
     <div id="liste-matieres">
-        <div class="subject-row">
-            <div><span class="label-style">MATIÈRE</span><input type="text" placeholder="Ex: Maths" class="m-name"></div>
-            <div><span class="label-style">COEF</span><input type="number" step="1" placeholder="1" class="m-coef"></div>
-            <div><span class="label-style">NOTE</span><input type="number" step="0.01" placeholder="/20" class="m-note"></div>
         </div>
-    </div>
 
     <button class="add-btn" onclick="ajouterLigne()">+ Ajouter une matière</button>
     <button class="btn-calc" onclick="calculerMoyenne()">CALCULER LA MOYENNE</button>
 </div>
 
 <script>
-    function ajouterLigne() {
+    // Charger les données sauvegardées ou créer une ligne vide
+    let matieresSaisies = JSON.parse(localStorage.getItem('notesSaved')) || [{nom:'', coef:'', note:''}];
+
+    function initialiser() {
+        const container = document.getElementById('liste-matieres');
+        container.innerHTML = '';
+        matieresSaisies.forEach((m, index) => creerLigne(m, index));
+    }
+
+    function creerLigne(data = {nom:'', coef:'', note:''}, index) {
         const container = document.getElementById('liste-matieres');
         const div = document.createElement('div');
         div.className = 'subject-row';
         div.innerHTML = `
-            <div><input type="text" placeholder="Matière" class="m-name"></div>
-            <div><input type="number" step="1" placeholder="Coef" class="m-coef"></div>
-            <div><input type="number" step="0.01" placeholder="Note" class="m-note"></div>
+            <div><span class="label-style">MATIÈRE</span><input type="text" value="${data.nom}" placeholder="Ex: Math" class="m-name" onchange="sauvegarder()"></div>
+            <div><span class="label-style">COEF</span><input type="number" value="${data.coef}" placeholder="1" class="m-coef" onchange="sauvegarder()"></div>
+            <div><span class="label-style">NOTE</span><input type="number" value="${data.note}" step="0.01" placeholder="/20" class="m-note" onchange="sauvegarder()"></div>
+            <button class="del-btn" onclick="supprimerLigne(this)">✕</button>
         `;
         container.appendChild(div);
+    }
+
+    function ajouterLigne() {
+        creerLigne();
+        sauvegarder();
+    }
+
+    function supprimerLigne(btn) {
+        btn.parentElement.remove();
+        sauvegarder();
+        calculerMoyenne();
+    }
+
+    function sauvegarder() {
+        const rows = document.querySelectorAll('.subject-row');
+        let currentData = [];
+        rows.forEach(row => {
+            currentData.push({
+                nom: row.querySelector('.m-name').value,
+                coef: row.querySelector('.m-coef').value,
+                note: row.querySelector('.m-note').value
+            });
+        });
+        localStorage.setItem('notesSaved', JSON.stringify(currentData));
     }
 
     function calculerMoyenne() {
         const coefs = document.querySelectorAll('.m-coef');
         const notes = document.querySelectorAll('.m-note');
-
-        let cumulPointsPonderes = 0;
-        let totalCoefficients = 0;
-        let valide = 0;
+        let cumulPoints = 0, totalCoef = 0, count = 0;
 
         for (let i = 0; i < notes.length; i++) {
             const n = parseFloat(notes[i].value);
             const c = parseFloat(coefs[i].value);
-
-            // Vérification stricte : on n'ajoute que si la note ET le coef sont des nombres valides
             if (!isNaN(n) && !isNaN(c) && c > 0) {
-                cumulPointsPonderes += (n * c);
-                totalCoefficients += c;
-                valide++;
+                cumulPoints += (n * c);
+                totalCoef += c;
+                count++;
             }
         }
 
-        const resultatDisplay = document.getElementById('moyenne-generale');
-        const infoDisplay = document.getElementById('info-calcul');
+        const res = document.getElementById('moyenne-generale');
+        const men = document.getElementById('mention');
+        const inf = document.getElementById('info-calcul');
 
-        if (totalCoefficients > 0) {
-            // Formule : Somme(Note * Coeff) / Somme(Coeffs)
-            const moyenneFinale = cumulPointsPonderes / totalCoefficients;
+        if (totalCoef > 0) {
+            const moyenne = cumulPoints / totalCoef;
+            res.textContent = moyenne.toFixed(2);
+            inf.textContent = `Calcul sur ${count} matières (Total Coeff: ${totalCoef})`;
             
-            // Affichage avec 2 décimales exactes
-            resultatDisplay.textContent = moyenneFinale.toFixed(2);
-            infoDisplay.textContent = `Calcul sur ${valide} matières (Total Coeff: ${totalCoefficients})`;
+            if (moyenne >= 16) men.textContent = "Excellent ! 🌟";
+            else if (moyenne >= 14) men.textContent = "Très Bien ! 👍";
+            else if (moyenne >= 12) men.textContent = "Assez Bien ✅";
+            else if (moyenne >= 10) men.textContent = "Passable 📝";
+            else men.textContent = "Encouragements ! 💪";
         } else {
-            alert("Erreur : Assurez-vous d'avoir rempli au moins une note et son coefficient (supérieur à 0).");
+            res.textContent = "--";
+            men.textContent = "";
+            inf.textContent = "Remplissez les notes et les coefficients";
         }
-        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-</script>
 
+    initialiser();
+</script>
 </body>
 </html>
 
