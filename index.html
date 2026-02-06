@@ -17,59 +17,64 @@
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg);
-            margin: 0; padding: 15px;
+            margin: 0; padding: 10px;
             display: flex; flex-direction: column; align-items: center;
         }
 
         .container { width: 100%; max-width: 500px; padding-bottom: 60px; }
 
-        .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 10px; }
 
         .tool-btn {
             background: white; border: none; border-radius: 12px;
-            width: 45px; height: 45px; font-size: 1.2rem;
+            width: 40px; height: 40px; font-size: 1.1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer;
         }
 
         .header-card {
             background: linear-gradient(135deg, var(--primary), #005f2d);
-            color: white; padding: 25px; border-radius: 25px;
-            text-align: center; margin-bottom: 20px;
+            color: white; padding: 20px; border-radius: 20px;
+            text-align: center; margin-bottom: 15px;
             box-shadow: 0 10px 20px rgba(0, 133, 63, 0.2);
         }
 
-        #moyenne-generale { font-size: 3.5rem; font-weight: 900; margin: 5px 0; color: var(--yellow); }
+        #moyenne-generale { font-size: 3rem; font-weight: 900; margin: 5px 0; color: var(--yellow); }
 
-        /* Bloc Matière complet */
+        /* Bloc Matière Optimisé */
         .subject-card {
-            background: white; padding: 15px; border-radius: 20px;
-            margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: white; padding: 12px; border-radius: 15px;
+            margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border-left: 5px solid var(--primary);
         }
 
-        .subject-header { display: flex; gap: 10px; margin-bottom: 10px; }
-        .subject-header input[type="text"] { flex: 2; font-weight: bold; border: none; border-bottom: 2px solid #eee; }
-        .subject-header input[type="number"] { flex: 1; text-align: center; background: #f1f5f9; border-radius: 8px; border: none; }
+        .subject-header { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+        .subject-header input[type="text"] { flex: 2; font-weight: bold; border: none; border-bottom: 2px solid #eee; padding: 5px; font-size: 0.9rem; }
+        .subject-header input[type="number"] { width: 50px; text-align: center; background: #f1f5f9; border-radius: 6px; border: none; padding: 5px; font-weight: bold; }
 
-        .notes-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .note-field { display: flex; flex-direction: column; }
-        .note-field label { font-size: 0.65rem; color: #64748b; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
-        .note-field input { padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; font-weight: bold; }
+        .notes-grid { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 5px;
+            flex-wrap: nowrap; /* Empêche de cacher la compo */
+        }
+        
+        .note-field { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .note-field label { font-size: 0.6rem; color: #64748b; font-weight: bold; margin-bottom: 3px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .note-field input { width: 100%; padding: 8px 2px; border: 1px solid #e2e8f0; border-radius: 6px; text-align: center; font-size: 0.9rem; font-weight: bold; box-sizing: border-box; }
 
         .btn-calc {
-            width: 100%; padding: 20px; background: var(--primary);
-            color: white; border: none; border-radius: 18px;
-            font-size: 1.2rem; font-weight: bold; margin: 15px 0;
+            width: 100%; padding: 18px; background: var(--primary);
+            color: white; border: none; border-radius: 15px;
+            font-size: 1.1rem; font-weight: bold; margin: 15px 0;
         }
 
+        .signature { text-align: center; font-size: 0.75rem; color: #94a3b8; margin-top: 20px; }
+        
         #history-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
         }
-
-        .modal-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 25px; }
-
-        .signature { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-top: 30px; }
+        .modal-content { background: white; width: 85%; max-width: 350px; padding: 20px; border-radius: 20px; }
     </style>
 </head>
 <body>
@@ -81,14 +86,14 @@
     </div>
 
     <div class="header-card">
-        <span style="font-size: 0.8rem; letter-spacing: 1px;">MOYENNE GÉNÉRALE</span>
+        <span style="font-size: 0.7rem; letter-spacing: 1px;">MOYENNE GÉNÉRALE</span>
         <div id="moyenne-generale">--</div>
-        <div id="info-coef" style="font-size: 0.8rem; opacity: 0.8;">Ajoutez vos notes</div>
+        <div id="info-coef" style="font-size: 0.7rem; opacity: 0.8;">Entrez D1, D2 et Compo</div>
     </div>
 
     <div id="liste-matieres"></div>
 
-    <button class="tool-btn" style="width:100%; border-radius:15px; font-size: 0.9rem;" onclick="ajouterLigne()">+ Ajouter une matière</button>
+    <button class="tool-btn" style="width:100%; border-radius:12px; font-size: 0.8rem; margin-bottom: 10px;" onclick="ajouterLigne()">+ Ajouter une matière</button>
     <button class="btn-calc" onclick="calculerMoyenne()">CALCULER LA MOYENNE</button>
 
     <div class="signature">Développé par Daouda Soumaré</div>
@@ -96,8 +101,8 @@
 
 <div id="history-modal">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <h3>Historique</h3>
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+            <h3 style="margin:0">Historique</h3>
             <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.2rem;">✕</button>
         </div>
         <div id="history-list"></div>
@@ -105,7 +110,10 @@
 </div>
 
 <script>
-    let matieres = JSON.parse(localStorage.getItem('notesSavedDevoirs')) || [{nom: 'Mathématiques', coef: 5, d1:'', d2:'', comp:''}];
+    let matieres = JSON.parse(localStorage.getItem('notesSavedDevoirs')) || [
+        {nom: 'Maths', coef: 5, d1:'', d2:'', comp:''},
+        {nom: 'Français', coef: 5, d1:'', d2:'', comp:''}
+    ];
     let historique = JSON.parse(localStorage.getItem('moyenneHistory')) || [];
 
     function initialiser() {
@@ -120,28 +128,20 @@
         div.innerHTML = `
             <div class="subject-header">
                 <input type="text" value="${data.nom}" placeholder="Matière" class="m-name" oninput="sauver()">
-                <input type="number" value="${data.coef}" placeholder="Coef" class="m-coef" oninput="sauver()">
-                <button onclick="this.parentElement.parentElement.remove(); sauver();" style="border:none; background:none; color:var(--accent); font-weight:bold;">✕</button>
+                <label style="font-size:0.6rem; font-weight:bold;">COEF</label>
+                <input type="number" value="${data.coef}" class="m-coef" oninput="sauver()">
+                <button onclick="this.parentElement.parentElement.remove(); sauver();" style="border:none; background:none; color:var(--accent); font-weight:bold; padding:5px;">✕</button>
             </div>
             <div class="notes-grid">
-                <div class="note-field">
-                    <label>Devoir 1</label>
-                    <input type="number" step="0.01" value="${data.d1 || ''}" class="m-d1" placeholder="--" oninput="sauver()">
-                </div>
-                <div class="note-field">
-                    <label>Devoir 2</label>
-                    <input type="number" step="0.01" value="${data.d2 || ''}" class="m-d2" placeholder="--" oninput="sauver()">
-                </div>
-                <div class="note-field" style="border-left: 1px dashed #cbd5e1; padding-left: 5px;">
-                    <label>Compo</label>
-                    <input type="number" step="0.01" value="${data.comp || ''}" class="m-comp" placeholder="--" oninput="sauver()">
-                </div>
+                <div class="note-field"><label>Devoir 1</label><input type="number" step="0.01" value="${data.d1 || ''}" class="m-d1" oninput="sauver()"></div>
+                <div class="note-field"><label>Devoir 2</label><input type="number" step="0.01" value="${data.d2 || ''}" class="m-d2" oninput="sauver()"></div>
+                <div class="note-field" style="background:#fff9c4; border-radius:5px;"><label style="color:#856404">Composition</label><input type="number" step="0.01" value="${data.comp || ''}" class="m-comp" oninput="sauver()"></div>
             </div>
         `;
         document.getElementById('liste-matieres').appendChild(div);
     }
 
-    function ajouterLigne() { creerLigne({nom:'', coef:1, d1:'', d2:'', comp:''}); sauver(); }
+    function ajouterLigne() { creerLigne({nom:'', coef:2, d1:'', d2:'', comp:''}); sauver(); }
 
     function sauver() {
         let data = [];
@@ -179,12 +179,12 @@
         if (totalCoef > 0) {
             const finale = (totalPoints / totalCoef).toFixed(2);
             res.textContent = finale;
-            document.getElementById('info-coef').textContent = `Total Coefficients : ${totalCoef}`;
+            document.getElementById('info-coef').textContent = `Total Coef : ${totalCoef}`;
             
             historique.unshift({ score: finale, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
             localStorage.setItem('moyenneHistory', JSON.stringify(historique.slice(0, 5)));
         } else {
-            alert("Remplissez au moins une matière complète (D1, D2, Compo et Coef) !");
+            alert("Complétez D1, D2, Compo et Coef pour au moins une matière !");
         }
     }
 
@@ -192,12 +192,12 @@
         const modal = document.getElementById('history-modal');
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
         const list = document.getElementById('history-list');
-        list.innerHTML = historique.map(h => `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee;"><span><b>${h.score}</b></span><span style="font-size:0.8rem; color:#888;">${h.date}</span></div>`).join('');
+        list.innerHTML = historique.map(h => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;"><span><b>${h.score}</b></span><span style="font-size:0.7rem; color:#888;">${h.date}</span></div>`).join('');
     }
 
     async function shareApp() {
         if (navigator.share) {
-            try { await navigator.share({ title: 'Calculateur Daouda', text: 'Calcule tes notes avec mon app !', url: window.location.href }); } catch (err) {}
+            try { await navigator.share({ title: 'Calculateur Daouda', text: 'Calcule ta moyenne avec mon app !', url: window.location.href }); } catch (err) {}
         }
     }
 
