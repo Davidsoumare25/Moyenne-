@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" id="theme-meta" content="#00853f">
-    <title>Calculateur Sénégal Pro</title>
+    <title>Calculateurde Moyenne</title>
     <style>
         :root {
             --primary: #00853f;
@@ -114,7 +114,7 @@
 
 <div class="container">
     <div class="top-tools">
-        <button class="tool-btn" onclick="shareApp()">📤</button>
+        <button class="tool-btn" onclick="shareApp()">🔁</button>
         <div>
             <button class="tool-btn" onclick="toggleDarkMode()">🌙</button>
             <button class="tool-btn" onclick="openSettings()">🎨</button>
@@ -134,7 +134,7 @@
     <button class="btn-calc" onclick="calculerMoyenne()">CALCULER LA MOYENNE</button>
     <button onclick="reinitialiserTout()" style="background:none; border:none; color:var(--accent); text-decoration:underline; font-size:0.8rem; cursor:pointer; width:100%;">Réinitialiser toutes les notes</button>
 
-    <div class="signature">Développé par Daouda Soumaré</div>
+    <div class="signature">@Daouda Soumaré</div>
 </div>
 
 <div id="history-modal" class="modal">
@@ -167,124 +167,134 @@
 </div>
 
 <script>
-    let matieres = JSON.parse(localStorage.getItem('notesSavedDevoirs')) || [{nom: 'Maths', coef: 5, d1:'', d2:'', comp:''}];
-    let historique = JSON.parse(localStorage.getItem('moyenneHistory')) || [];
+ let matieres = JSON.parse(localStorage.getItem('saved_m')) || [{n:'Maths', c:5, d1:'', d2:'', co:''}];
+let hist = JSON.parse(localStorage.getItem('saved_h')) || [];
 
-    // --- ENREGISTREMENT DU SERVICE WORKER POUR LA BARRE DE NOTIFS ---
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-    }
+// --- LOGIQUE SERVICE WORKER & MISE À JOUR ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            // Détecter une mise à jour du code
+            reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // Une nouvelle version est disponible !
+                        if (confirm("Une mise à jour est disponible ! Voulez-vous l'installer pour profiter des nouveautés ?")) {
+                            window.location.reload();
+                        }
+                    }
+                };
+            };
+        });
+    });
+}
 
-    function envoyerNotificationSysteme(moyenne) {
-        if ("Notification" in window) {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    navigator.serviceWorker.ready.then(reg => {
-                        reg.showNotification('Calculateur Sénégal Pro', {
-                            body: `Moyenne : ${moyenne}/20. Bravo !`,
-                            icon: 'https://cdn-icons-png.flaticon.com/512/190/190411.png',
-                            vibrate: [200, 100, 200],
-                            tag: 'moyenne-notif'
-                        });
-                    });
+// --- LOGIQUE INSTALLATION (BANDEAU) ---
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Empêche Chrome d'afficher la petite barre grise par défaut
+    e.preventDefault();
+    deferredPrompt = e;
+    // On affiche notre propre notification d'installation après 3 secondes
+    setTimeout(() => {
+        if (confirm("Voulez-vous installer 'Calculateur Sénégal' sur votre écran d'accueil pour l'utiliser hors-ligne ?")) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Utilisateur a installé l\'app');
                 }
+                deferredPrompt = null;
             });
         }
-    }
+    }, 3000);
+});
 
-    function showToast(moyenne) {
-        const toast = document.getElementById('custom-toast');
-        document.getElementById('toast-title').innerText = `Moyenne : ${moyenne}/20`;
-        document.getElementById('toast-body').innerText = moyenne >= 10 ? "Admis ! 🎉" : "Courage ! 📚";
-        toast.classList.add('show');
-        setTimeout(() => { toast.classList.remove('show'); }, 4000);
-    }
+// --- RESTE DE TES FONCTIONS (Calcul, Render, etc.) ---
+function init() {
+    if(localStorage.getItem('dark') === '1') document.body.classList.add('dark-mode');
+    setTheme(localStorage.getItem('theme') || 'green');
+    render();
+}
 
-    function initialiser() {
-        if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode');
-        const savedTheme = localStorage.getItem('appTheme');
-        if (savedTheme) setTheme(savedTheme);
-        const list = document.getElementById('liste-matieres');
-        list.innerHTML = '';
-        matieres.forEach(m => creerLigne(m));
-    }
-
-    function creerLigne(data) {
+function render() {
+    const container = document.getElementById('liste-matieres');
+    container.innerHTML = '';
+    matieres.forEach((m, i) => {
         const div = document.createElement('div');
         div.className = 'subject-card';
         div.innerHTML = `
             <div class="subject-header">
-                <input type="text" value="${data.nom}" class="m-name" oninput="sauver()">
-                <input type="number" value="${data.coef}" class="m-coef" style="width:50px" oninput="sauver()">
-                <button onclick="this.parentElement.parentElement.remove(); sauver();" style="border:none; background:none; color:var(--accent); font-weight:bold;">✕</button>
+                <input type="text" value="${m.n}" placeholder="Matière" oninput="update(${i}, 'n', this.value)">
+                <input type="number" value="${m.c}" style="width:40px" oninput="update(${i}, 'c', this.value)">
+                <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent); font-weight:bold; cursor:pointer;">✕</button>
             </div>
             <div class="notes-grid">
-                <div class="note-field"><label>D1</label><input type="number" step="0.01" value="${data.d1 || ''}" class="m-d1" oninput="sauver()"></div>
-                <div class="note-field"><label>D2</label><input type="number" step="0.01" value="${data.d2 || ''}" class="m-d2" oninput="sauver()"></div>
-                <div class="note-field"><label>Compo</label><input type="number" step="0.01" value="${data.comp || ''}" class="m-comp" oninput="sauver()"></div>
-            </div>
-        `;
-        document.getElementById('liste-matieres').appendChild(div);
-    }
+                <div class="note-field"><label>DEVOIR 1</label><input type="number" step="0.01" value="${m.d1}" oninput="update(${i}, 'd1', this.value)"></div>
+                <div class="note-field"><label>DEVOIR 2</label><input type="number" step="0.01" value="${m.d2}" oninput="update(${i}, 'd2', this.value)"></div>
+                <div class="note-field"><label>COMPO</label><input type="number" step="0.01" value="${m.co}" oninput="update(${i}, 'co', this.value)"></div>
+            </div>`;
+        container.appendChild(div);
+    });
+}
 
-    function ajouterLigne() { creerLigne({nom:'', coef:1, d1:'', d2:'', comp:''}); sauver(); }
+function update(i, field, val) { matieres[i][field] = val; localStorage.setItem('saved_m', JSON.stringify(matieres)); }
+function ajouterMatiere() { matieres.push({n:'', c:1, d1:'', d2:'', co:''}); render(); }
+function remove(i) { matieres.splice(i, 1); render(); localStorage.setItem('saved_m', JSON.stringify(matieres)); }
 
-    function sauver() {
-        let data = [];
-        document.querySelectorAll('.subject-card').forEach(card => {
-            data.push({
-                nom: card.querySelector('.m-name').value,
-                coef: card.querySelector('.m-coef').value,
-                d1: card.querySelector('.m-d1').value,
-                d2: card.querySelector('.m-d2').value,
-                comp: card.querySelector('.m-comp').value
+function calculer() {
+    let pts = 0, coefs = 0;
+    matieres.forEach(m => {
+        let c = parseFloat(m.c) || 0;
+        let n1 = parseFloat(m.d1), n2 = parseFloat(m.d2), nc = parseFloat(m.co);
+        if(!isNaN(n1) && !isNaN(n2) && !isNaN(nc) && c > 0) {
+            pts += (((n1+n2)/2 + nc)/2) * c;
+            coefs += c;
+        }
+    });
+
+    if(coefs > 0) {
+        let res = (pts/coefs).toFixed(2);
+        document.getElementById('moyenne-generale').innerText = res;
+        notif(res);
+        hist.unshift({s: res, d: new Date().toLocaleDateString()});
+        localStorage.setItem('saved_h', JSON.stringify(hist.slice(0, 10)));
+    } else { alert("Remplissez au moins une ligne !"); }
+}
+
+function notif(m) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification('Moyenne : ' + m + '/20', { 
+                body: 'Ton résultat est enregistré.', 
+                icon: 'https://cdn-icons-png.flaticon.com/512/190/190411.png' 
             });
         });
-        localStorage.setItem('notesSavedDevoirs', JSON.stringify(data));
     }
+    const t = document.getElementById('custom-toast');
+    document.getElementById('toast-msg').innerText = "Moyenne : " + m + "/20";
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+}
 
-    function calculerMoyenne() {
-        let totalPoints = 0; let totalCoef = 0;
-        document.querySelectorAll('.subject-card').forEach(card => {
-            const coef = parseFloat(card.querySelector('.m-coef').value) || 0;
-            const d1 = parseFloat(card.querySelector('.m-d1').value);
-            const d2 = parseFloat(card.querySelector('.m-d2').value);
-            const comp = parseFloat(card.querySelector('.m-comp').value);
-            if (!isNaN(d1) && !isNaN(d2) && !isNaN(comp) && coef > 0) {
-                totalPoints += ((((d1 + d2) / 2) + comp) / 2) * coef;
-                totalCoef += coef;
-            }
-        });
+function setTheme(t) {
+    document.body.classList.remove('theme-blue','theme-orange','theme-pink','theme-purple','theme-red','theme-cyan');
+    if(t !== 'green') document.body.classList.add('theme-'+t);
+    localStorage.setItem('theme', t);
+}
 
-        if (totalCoef > 0) {
-            const finale = (totalPoints / totalCoef).toFixed(2);
-            document.getElementById('moyenne-generale').textContent = finale;
-            showToast(finale);
-            envoyerNotificationSysteme(finale);
-            historique.unshift({ score: finale, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
-            localStorage.setItem('moyenneHistory', JSON.stringify(historique.slice(0, 15)));
-        } else { alert("Données incomplètes !"); }
-    }
+function toggleDark() { 
+    document.body.classList.toggle('dark-mode'); 
+    localStorage.setItem('dark', document.body.classList.contains('dark-mode') ? '1' : '0'); 
+}
 
-    function reinitialiserTout() { if(confirm("Effacer ?")) { localStorage.removeItem('notesSavedDevoirs'); matieres = [{nom:'Maths', coef:5}]; initialiser(); document.getElementById('moyenne-generale').textContent = "--"; } }
-    function clearHistory() { if(confirm("Vider ?")) { historique = []; localStorage.removeItem('moyenneHistory'); toggleHistory(); toggleHistory(); } }
-    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled'); }
-    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
-    function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
-    function setTheme(theme) {
-        document.body.classList.remove('theme-blue', 'theme-orange', 'theme-pink', 'theme-purple', 'theme-yellow', 'theme-red', 'theme-cyan', 'theme-dark');
-        if (theme !== 'green') document.body.classList.add('theme-' + theme);
-        localStorage.setItem('appTheme', theme);
-    }
-    function toggleHistory() {
-        const modal = document.getElementById('history-modal');
-        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-        const list = document.getElementById('history-list');
-        list.innerHTML = historique.length > 0 ? historique.map(h => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);"><span><b>${h.score}</b></span><span style="font-size:0.8rem;">${h.date}</span></div>`).join('') : '<p>Vide.</p>';
-    }
-    async function shareApp() { if (navigator.share) { try { await navigator.share({ title: 'Calculateur Sénégal', url: window.location.href }); } catch (err) {} } }
-    initialiser();
-</script>
-</body>
-</html>
+function openThemes() { document.getElementById('modal-themes').style.display = 'flex'; }
+function closeThemes() { document.getElementById('modal-themes').style.display = 'none'; }
+function toggleHistory() {
+    const m = document.getElementById('modal-history');
+    m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+    document.getElementById('hist-list').innerHTML = hist.map(h => `<div style="padding:10px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between;"><b>${h.s}</b> <span>${h.d}</span></div>`).join('') || "Aucun historique";
+}
 
+init();
+Notification.requestPermission();
