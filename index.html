@@ -7,7 +7,6 @@
     <title>Calculateur Sénégal Pro</title>
     <link rel="manifest" href="manifest.json">
     <style>
-        /* Système de thèmes */
         :root {
             --primary: #00853f;
             --primary-dark: #005f2d;
@@ -20,7 +19,6 @@
             --border: #e2e8f0;
         }
 
-        /* Thèmes de couleurs additionnels */
         body.theme-blue { --primary: #2563eb; --primary-dark: #1e40af; }
         body.theme-orange { --primary: #f97316; --primary-dark: #c2410c; }
         body.theme-pink { --primary: #db2777; --primary-dark: #9d174d; }
@@ -77,7 +75,7 @@
             flex: 2; font-weight: bold; border: none; 
             border-bottom: 2px solid var(--border); 
             background: transparent; color: var(--text);
-            font-size: 0.95rem; width: 50%;
+            font-size: 0.95rem;
         }
         .subject-header input[type="number"] { 
             width: 50px; text-align: center; background: var(--bg); 
@@ -86,7 +84,7 @@
 
         .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .note-field { display: flex; flex-direction: column; min-width: 0; }
-        .note-field label { font-size: 0.6rem; color: var(--text-light); font-weight: bold; margin-bottom: 4px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .note-field label { font-size: 0.6rem; color: var(--text-light); font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
         .note-field input { width: 100%; padding: 8px 4px; border: 1px solid var(--border); border-radius: 8px; text-align: center; font-weight: bold; background: var(--bg); color: var(--text); box-sizing: border-box; }
 
         .btn-calc {
@@ -103,7 +101,6 @@
 
         .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; justify-items: center; }
         .theme-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s; }
-        .theme-dot:active { transform: scale(0.9); }
 
         .signature { text-align: center; font-size: 0.8rem; color: var(--text-light); margin-top: 20px; }
     </style>
@@ -149,17 +146,16 @@
 <div id="settings-modal" class="modal">
     <div class="modal-content">
         <h3 style="text-align: center;">Thèmes de l'app</h3>
-        <p style="font-size: 0.85rem; color: var(--text-light); text-align: center;">Choisissez votre couleur préférée :</p>
         <div class="theme-selector">
-            <div class="theme-dot" style="background: #00853f;" title="Vert" onclick="setTheme('green')"></div>
-            <div class="theme-dot" style="background: #2563eb;" title="Bleu" onclick="setTheme('blue')"></div>
-            <div class="theme-dot" style="background: #f97316;" title="Orange" onclick="setTheme('orange')"></div>
-            <div class="theme-dot" style="background: #db2777;" title="Rose" onclick="setTheme('pink')"></div>
-            <div class="theme-dot" style="background: #7c3aed;" title="Violet" onclick="setTheme('purple')"></div>
-            <div class="theme-dot" style="background: #eab308;" title="Jaune" onclick="setTheme('yellow')"></div>
-            <div class="theme-dot" style="background: #dc2626;" title="Rouge" onclick="setTheme('red')"></div>
-            <div class="theme-dot" style="background: #0891b2;" title="Cyan" onclick="setTheme('cyan')"></div>
-            <div class="theme-dot" style="background: #334155;" title="Gris" onclick="setTheme('dark')"></div>
+            <div class="theme-dot" style="background: #00853f;" onclick="setTheme('green')"></div>
+            <div class="theme-dot" style="background: #2563eb;" onclick="setTheme('blue')"></div>
+            <div class="theme-dot" style="background: #f97316;" onclick="setTheme('orange')"></div>
+            <div class="theme-dot" style="background: #db2777;" onclick="setTheme('pink')"></div>
+            <div class="theme-dot" style="background: #7c3aed;" onclick="setTheme('purple')"></div>
+            <div class="theme-dot" style="background: #eab308;" onclick="setTheme('yellow')"></div>
+            <div class="theme-dot" style="background: #dc2626;" onclick="setTheme('red')"></div>
+            <div class="theme-dot" style="background: #0891b2;" onclick="setTheme('cyan')"></div>
+            <div class="theme-dot" style="background: #334155;" onclick="setTheme('dark')"></div>
         </div>
         <button onclick="closeSettings()" class="btn-calc" style="padding: 12px; margin-top: 10px;">Valider</button>
     </div>
@@ -169,7 +165,26 @@
     let matieres = JSON.parse(localStorage.getItem('notesSavedDevoirs')) || [{nom: 'Mathématiques', coef: 5, d1:'', d2:'', comp:''}];
     let historique = JSON.parse(localStorage.getItem('moyenneHistory')) || [];
 
+    // --- LOGIQUE NOTIFICATIONS ---
+    function demanderPermissionNotif() {
+        if ("Notification" in window) {
+            Notification.requestPermission();
+        }
+    }
+
+    function envoyerNotification(moyenne) {
+        if ("Notification" in window && Notification.permission === "granted") {
+            let mention = moyenne >= 16 ? "Excellent ! 🌟" : moyenne >= 12 ? "Félicitations ! 👍" : "Continue tes efforts ! 💪";
+            new Notification("Calculateur Sénégal Pro", {
+                body: `Ta moyenne est de ${moyenne}/20. ${mention}`,
+                icon: "https://cdn-icons-png.flaticon.com/512/190/190411.png"
+            });
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        }
+    }
+
     function initialiser() {
+        demanderPermissionNotif();
         if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode');
         const savedTheme = localStorage.getItem('appTheme');
         if (savedTheme) setTheme(savedTheme);
@@ -223,11 +238,10 @@
     }
 
     function clearHistory() {
-        if(confirm("Voulez-vous vraiment vider tout l'historique ?")) {
+        if(confirm("Vider l'historique ?")) {
             historique = [];
             localStorage.removeItem('moyenneHistory');
-            toggleHistory(); // Rafraîchir l'affichage (fermera et rouvrira ou videra)
-            toggleHistory();
+            toggleHistory(); toggleHistory();
         }
     }
 
@@ -250,6 +264,10 @@
             const finale = (totalPoints / totalCoef).toFixed(2);
             document.getElementById('moyenne-generale').textContent = finale;
             document.getElementById('info-coef').textContent = `Total Coefficients : ${totalCoef}`;
+            
+            // Envoyer la notification
+            envoyerNotification(finale);
+
             historique.unshift({ score: finale, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
             localStorage.setItem('moyenneHistory', JSON.stringify(historique.slice(0, 15)));
         } else { alert("Remplissez une ligne complète !"); }
@@ -277,12 +295,12 @@
         const list = document.getElementById('history-list');
         list.innerHTML = historique.length > 0 
             ? historique.map(h => `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);"><span><b>${h.score}</b></span><span style="font-size:0.8rem; color:var(--text-light);">${h.date}</span></div>`).join('')
-            : '<p style="text-align:center; color:var(--text-light); font-size:0.9rem;">Aucun historique disponible.</p>';
+            : '<p style="text-align:center; color:var(--text-light);">Historique vide.</p>';
     }
 
     async function shareApp() {
         if (navigator.share) {
-            try { await navigator.share({ title: 'Calculateur Sénégal', text: 'Calcule tes notes facilement !', url: window.location.href }); } catch (err) {}
+            try { await navigator.share({ title: 'Calculateur Sénégal', text: 'Mon app de notes !', url: window.location.href }); } catch (err) {}
         }
     }
 
