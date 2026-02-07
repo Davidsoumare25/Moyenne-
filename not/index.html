@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" id="theme-meta" content="#00853f">
     <title>Calculateur Sénégal Pro</title>
-    <link rel="manifest" href="manifest.json">
     <style>
         :root {
             --primary: #00853f;
@@ -19,7 +18,7 @@
             --border: #e2e8f0;
         }
 
-        /* Thèmes */
+        /* Thèmes de couleurs */
         body.theme-blue { --primary: #2563eb; --primary-dark: #1e40af; }
         body.theme-orange { --primary: #f97316; --primary-dark: #c2410c; }
         body.theme-pink { --primary: #db2777; --primary-dark: #9d174d; }
@@ -38,10 +37,10 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg); color: var(--text);
             margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center;
-            transition: all 0.3s ease; overflow-x: hidden;
+            transition: all 0.3s ease;
         }
 
-        /* BANDEAU DE NOTIFICATION INTERNE */
+        /* Notification Interne (Toast) */
         #custom-toast {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px; background: var(--card-bg);
@@ -63,25 +62,25 @@
         .header-card {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white; padding: 20px; border-radius: 25px;
-            text-align: center; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            text-align: center; margin-bottom: 20px;
         }
 
         #moyenne-generale { font-size: 3rem; font-weight: 900; margin: 5px 0; color: var(--yellow); }
 
         .subject-card {
             background: var(--card-bg); padding: 12px; border-radius: 20px;
-            margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--primary);
+            margin-bottom: 12px; border-left: 5px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .subject-header { display: flex; gap: 8px; margin-bottom: 10px; }
         .subject-header input { 
             background: transparent; color: var(--text); border: none; 
-            border-bottom: 2px solid var(--border); font-weight: bold;
+            border-bottom: 2px solid var(--border); font-weight: bold; width: 100%;
         }
 
         .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .note-field { display: flex; flex-direction: column; min-width: 0; }
+        .note-field { display: flex; flex-direction: column; }
         .note-field label { font-size: 0.6rem; color: var(--text-light); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
         .note-field input { 
             width: 100%; padding: 10px 5px; border: 1px solid var(--border); 
@@ -109,7 +108,7 @@
         <div id="toast-icon" style="font-size: 1.5rem;">🎓</div>
         <div>
             <div id="toast-title" style="font-weight: bold; font-size: 0.9rem;">Résultat calculé !</div>
-            <div id="toast-body" style="font-size: 0.8rem; color: var(--text-light);">Ta moyenne est prête.</div>
+            <div id="toast-body" style="font-size: 0.8rem; color: var(--text-light);">--</div>
         </div>
     </div>
 
@@ -145,7 +144,7 @@
             <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.5rem; color:var(--text);">✕</button>
         </div>
         <div id="history-list" style="max-height: 250px; overflow-y: auto;"></div>
-        <button onclick="clearHistory()" style="width:100%; margin-top:20px; color:var(--accent); border:1px solid var(--accent); background:none; padding:10px; border-radius:10px; font-size:0.8rem; cursor:pointer;">🗑️ Vider l'historique</button>
+        <button onclick="clearHistory()" style="width:100%; margin-top:20px; color:var(--accent); border:1px solid var(--accent); background:none; padding:10px; border-radius:10px; font-size:0.8rem; cursor:pointer;">🗑️ Vider</button>
     </div>
 </div>
 
@@ -163,7 +162,7 @@
             <div class="theme-dot" style="background: #0891b2;" onclick="setTheme('cyan')"></div>
             <div class="theme-dot" style="background: #334155;" onclick="setTheme('dark')"></div>
         </div>
-        <button onclick="closeSettings()" class="btn-calc" style="padding: 10px;">Valider</button>
+        <button onclick="closeSettings()" class="btn-calc" style="padding: 10px;">Fermer</button>
     </div>
 </div>
 
@@ -171,22 +170,33 @@
     let matieres = JSON.parse(localStorage.getItem('notesSavedDevoirs')) || [{nom: 'Maths', coef: 5, d1:'', d2:'', comp:''}];
     let historique = JSON.parse(localStorage.getItem('moyenneHistory')) || [];
 
+    // --- ENREGISTREMENT DU SERVICE WORKER POUR LA BARRE DE NOTIFS ---
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
+
+    function envoyerNotificationSysteme(moyenne) {
+        if ("Notification" in window) {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    navigator.serviceWorker.ready.then(reg => {
+                        reg.showNotification('Calculateur Sénégal Pro', {
+                            body: `Moyenne : ${moyenne}/20. Bravo !`,
+                            icon: 'https://cdn-icons-png.flaticon.com/512/190/190411.png',
+                            vibrate: [200, 100, 200],
+                            tag: 'moyenne-notif'
+                        });
+                    });
+                }
+            });
+        }
+    }
+
     function showToast(moyenne) {
         const toast = document.getElementById('custom-toast');
-        const title = document.getElementById('toast-title');
-        const body = document.getElementById('toast-body');
-        const icon = document.getElementById('toast-icon');
-
-        let mention = moyenne >= 16 ? "Excellent ! 🌟" : moyenne >= 12 ? "Très bien ! 👍" : "Passable, courage ! 💪";
-        let emoji = moyenne >= 12 ? "🎉" : "📚";
-
-        title.innerText = `Moyenne : ${moyenne}/20`;
-        body.innerText = mention;
-        icon.innerText = emoji;
-
+        document.getElementById('toast-title').innerText = `Moyenne : ${moyenne}/20`;
+        document.getElementById('toast-body').innerText = moyenne >= 10 ? "Admis ! 🎉" : "Courage ! 📚";
         toast.classList.add('show');
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-
         setTimeout(() => { toast.classList.remove('show'); }, 4000);
     }
 
@@ -205,7 +215,7 @@
         div.innerHTML = `
             <div class="subject-header">
                 <input type="text" value="${data.nom}" class="m-name" oninput="sauver()">
-                <input type="number" value="${data.coef}" class="m-coef" oninput="sauver()">
+                <input type="number" value="${data.coef}" class="m-coef" style="width:50px" oninput="sauver()">
                 <button onclick="this.parentElement.parentElement.remove(); sauver();" style="border:none; background:none; color:var(--accent); font-weight:bold;">✕</button>
             </div>
             <div class="notes-grid">
@@ -240,10 +250,8 @@
             const d1 = parseFloat(card.querySelector('.m-d1').value);
             const d2 = parseFloat(card.querySelector('.m-d2').value);
             const comp = parseFloat(card.querySelector('.m-comp').value);
-
             if (!isNaN(d1) && !isNaN(d2) && !isNaN(comp) && coef > 0) {
-                const moyMatiere = (((d1 + d2) / 2) + comp) / 2;
-                totalPoints += (moyMatiere * coef);
+                totalPoints += ((((d1 + d2) / 2) + comp) / 2) * coef;
                 totalCoef += coef;
             }
         });
@@ -251,15 +259,15 @@
         if (totalCoef > 0) {
             const finale = (totalPoints / totalCoef).toFixed(2);
             document.getElementById('moyenne-generale').textContent = finale;
-            document.getElementById('info-coef').textContent = `Coefficients : ${totalCoef}`;
             showToast(finale);
+            envoyerNotificationSysteme(finale);
             historique.unshift({ score: finale, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
             localStorage.setItem('moyenneHistory', JSON.stringify(historique.slice(0, 15)));
         } else { alert("Données incomplètes !"); }
     }
 
-    function reinitialiserTout() { if(confirm("Vider les notes ?")) { localStorage.removeItem('notesSavedDevoirs'); matieres = [{nom:'Maths', coef:5}]; initialiser(); document.getElementById('moyenne-generale').textContent = "--"; } }
-    function clearHistory() { if(confirm("Vider l'historique ?")) { historique = []; localStorage.removeItem('moyenneHistory'); toggleHistory(); toggleHistory(); } }
+    function reinitialiserTout() { if(confirm("Effacer ?")) { localStorage.removeItem('notesSavedDevoirs'); matieres = [{nom:'Maths', coef:5}]; initialiser(); document.getElementById('moyenne-generale').textContent = "--"; } }
+    function clearHistory() { if(confirm("Vider ?")) { historique = []; localStorage.removeItem('moyenneHistory'); toggleHistory(); toggleHistory(); } }
     function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled'); }
     function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
     function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
@@ -267,16 +275,14 @@
         document.body.classList.remove('theme-blue', 'theme-orange', 'theme-pink', 'theme-purple', 'theme-yellow', 'theme-red', 'theme-cyan', 'theme-dark');
         if (theme !== 'green') document.body.classList.add('theme-' + theme);
         localStorage.setItem('appTheme', theme);
-        const color = getComputedStyle(document.body).getPropertyValue('--primary').trim();
-        document.getElementById('theme-meta').setAttribute('content', color);
     }
     function toggleHistory() {
         const modal = document.getElementById('history-modal');
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
         const list = document.getElementById('history-list');
-        list.innerHTML = historique.length > 0 ? historique.map(h => `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);"><span><b>${h.score}</b></span><span style="font-size:0.8rem; color:var(--text-light);">${h.date}</span></div>`).join('') : '<p>Vide.</p>';
+        list.innerHTML = historique.length > 0 ? historique.map(h => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);"><span><b>${h.score}</b></span><span style="font-size:0.8rem;">${h.date}</span></div>`).join('') : '<p>Vide.</p>';
     }
-    async function shareApp() { if (navigator.share) { try { await navigator.share({ title: 'Calculateur Sénégal', text: 'Mes notes !', url: window.location.href }); } catch (err) {} } }
+    async function shareApp() { if (navigator.share) { try { await navigator.share({ title: 'Calculateur Sénégal', url: window.location.href }); } catch (err) {} } }
     initialiser();
 </script>
 </body>
