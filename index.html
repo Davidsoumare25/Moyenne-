@@ -3,157 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#00853f">
+    <meta name="theme-color" id="theme-meta" content="#00853f">
     <title>Calculateur Sénégal Pro</title>
     <link rel="manifest" href="manifest.json">
     <style>
+        /* Système de thèmes */
         :root {
             --primary: #00853f;
+            --primary-dark: #005f2d;
             --accent: #e31b23;
-            --bg: #f1f5f9;
+            --yellow: #fdef42;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        /* Thèmes de couleurs additionnels */
+        body.theme-blue { --primary: #2563eb; --primary-dark: #1e40af; }
+        body.theme-orange { --primary: #f97316; --primary-dark: #c2410c; }
+        body.theme-pink { --primary: #db2777; --primary-dark: #9d174d; }
+        body.theme-purple { --primary: #7c3aed; --primary-dark: #5b21b6; }
+        body.theme-yellow { --primary: #eab308; --primary-dark: #a16207; }
+        body.theme-red { --primary: #dc2626; --primary-dark: #991b1b; }
+        body.theme-cyan { --primary: #0891b2; --primary-dark: #155e75; }
+        body.theme-dark { --primary: #334155; --primary-dark: #0f172a; }
+
+        body.dark-mode {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-light: #94a3b8;
+            --border: #334155;
         }
 
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg);
+            color: var(--text);
             margin: 0; padding: 10px;
             display: flex; flex-direction: column; align-items: center;
+            transition: background 0.3s ease;
         }
 
         .container { width: 100%; max-width: 500px; padding-bottom: 60px; }
 
-        /* Alerte Objectif en haut de page */
-        #top-alert {
-            width: 100%; text-align: center; margin-bottom: 15px;
-            display: none; animation: fadeIn 0.5s ease;
-        }
-        .alert-box {
-            background: #fff3f3; color: #e31b23; padding: 15px;
-            border-radius: 18px; border: 1px solid #ffcccc;
-            font-weight: bold; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 15px; }
 
         .tool-btn {
-            background: white; border: none; border-radius: 12px;
-            width: 42px; height: 42px; font-size: 1.1rem;
+            background: var(--card-bg); border: none; border-radius: 12px;
+            width: 42px; height: 42px; font-size: 1.1rem; color: var(--text);
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer;
         }
 
         .header-card {
-            background: linear-gradient(135deg, var(--primary), #005f2d);
-            color: white; padding: 25px; border-radius: 25px;
-            text-align: center; margin-bottom: 15px;
-            transition: all 0.6s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; padding: 20px; border-radius: 25px;
+            text-align: center; margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
 
-        .header-card.red { background: linear-gradient(135deg, #e31b23, #991b1b); }
-        .header-card.orange { background: linear-gradient(135deg, #f97316, #c2410c); }
-        .header-card.yellow { background: linear-gradient(135deg, #eab308, #a16207); }
-        .header-card.green-success { background: linear-gradient(135deg, #00853f, #166534); }
-
-        #moyenne-generale { font-size: 3.5rem; font-weight: 900; margin: 5px 0; color: white; }
-
-        .goal-box {
-            background: #fff; padding: 15px; border-radius: 15px;
-            margin-bottom: 15px; border: 2px dashed var(--primary);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .goal-box input { width: 65px; padding: 8px; border-radius: 8px; border: 1px solid #ddd; text-align: center; font-weight: bold; font-size: 1rem; }
+        #moyenne-generale { font-size: 3rem; font-weight: 900; margin: 5px 0; color: var(--yellow); }
 
         .subject-card {
-            background: white; padding: 15px; border-radius: 20px;
-            margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            background: var(--card-bg); padding: 12px; border-radius: 20px;
+            margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary);
         }
 
-        .subject-header { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
-        .subject-header input[type="text"] { flex: 2; font-weight: bold; border: none; border-bottom: 2px solid #f1f5f9; font-size: 1rem; padding: 5px; }
-        .subject-header input[type="number"] { width: 55px; text-align: center; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; font-weight: bold; }
+        .subject-header { display: flex; gap: 8px; margin-bottom: 10px; }
+        .subject-header input[type="text"] { 
+            flex: 2; font-weight: bold; border: none; 
+            border-bottom: 2px solid var(--border); 
+            background: transparent; color: var(--text);
+            font-size: 0.95rem; width: 50%;
+        }
+        .subject-header input[type="number"] { 
+            width: 50px; text-align: center; background: var(--bg); 
+            border-radius: 8px; border: none; color: var(--text); font-weight: bold;
+        }
 
-        .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .note-field { display: flex; flex-direction: column; }
-        .note-field label { font-size: 0.65rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
-        .note-field input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; text-align: center; font-weight: bold; font-size: 1.1rem; }
+        .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .note-field { display: flex; flex-direction: column; min-width: 0; }
+        .note-field label { font-size: 0.6rem; color: var(--text-light); font-weight: bold; margin-bottom: 4px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .note-field input { width: 100%; padding: 8px 4px; border: 1px solid var(--border); border-radius: 8px; text-align: center; font-weight: bold; background: var(--bg); color: var(--text); box-sizing: border-box; }
 
         .btn-calc {
-            width: 100%; padding: 20px; background: var(--primary);
-            color: white; border: none; border-radius: 22px;
-            font-size: 1.2rem; font-weight: bold; margin: 15px 0 5px 0;
-            box-shadow: 0 4px 12px rgba(0,133,63,0.3); cursor: pointer;
+            width: 100%; padding: 18px; background: var(--primary);
+            color: white; border: none; border-radius: 18px;
+            font-size: 1.1rem; font-weight: bold; margin: 15px 0;
+            cursor: pointer;
         }
 
-        .btn-reset {
-            width: 100%; padding: 10px; background: transparent;
-            color: #94a3b8; border: none; font-size: 0.8rem; cursor: pointer;
-            text-decoration: underline; margin-bottom: 20px;
-        }
+        .btn-reset { background: none; border: none; color: var(--accent); text-decoration: underline; font-size: 0.8rem; cursor: pointer; width: 100%; margin-top: 5px; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); width: 85%; max-width: 350px; padding: 25px; border-radius: 25px; color: var(--text); position: relative; }
 
-        #history-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
-        }
-        .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 25px; max-height: 80vh; overflow-y: auto; }
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f1f5f9; }
+        .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; justify-items: center; }
+        .theme-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .theme-dot:active { transform: scale(0.9); }
 
-        .signature { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-top: 10px; }
+        .signature { text-align: center; font-size: 0.8rem; color: var(--text-light); margin-top: 20px; }
     </style>
 </head>
-<body>
+<body id="app-body">
 
 <div class="container">
-    <div id="top-alert"></div>
-
     <div class="top-tools">
         <button class="tool-btn" onclick="shareApp()">📤</button>
-        <button class="tool-btn" onclick="toggleHistory()">🕒</button>
+        <div>
+            <button class="tool-btn" onclick="toggleDarkMode()">🌙</button>
+            <button class="tool-btn" onclick="openSettings()">🎨</button>
+            <button class="tool-btn" onclick="toggleHistory()">🕒</button>
+        </div>
     </div>
 
-    <div class="header-card" id="main-card">
-        <span style="font-size: 0.8rem; letter-spacing: 1px; font-weight: 600;">MOYENNE GÉNÉRALE</span>
+    <div class="header-card">
+        <span style="font-size: 0.8rem; letter-spacing: 1px;">MOYENNE GÉNÉRALE</span>
         <div id="moyenne-generale">--</div>
-        <div id="mention" style="font-weight: bold; font-size: 0.9rem;"></div>
-    </div>
-
-    <div class="goal-box">
-        <span style="font-size: 0.95rem; font-weight: 700;">🎯 Objectif Moyenne :</span>
-        <input type="number" id="target-moyenne" value="12" step="0.5" oninput="sauver()">
+        <div id="info-coef" style="font-size: 0.8rem; opacity: 0.8;">Ajoutez vos notes</div>
     </div>
 
     <div id="liste-matieres"></div>
 
-    <button class="tool-btn" style="width:100%; border-radius:15px; margin-bottom:10px; font-size: 0.9rem; font-weight: bold;" onclick="ajouterLigne()">+ AJOUTER UNE MATIÈRE</button>
-    
-    <button class="btn-calc" onclick="calculerMoyenne(true)">CALCULER & ENREGISTRER</button>
-    
-    <button class="btn-reset" onclick="resetApp()">Réinitialiser toutes les notes</button>
+    <button class="tool-btn" style="width:100%; border-radius:15px; font-size: 0.85rem;" onclick="ajouterLigne()">+ Ajouter une matière</button>
+    <button class="btn-calc" onclick="calculerMoyenne()">CALCULER LA MOYENNE</button>
+    <button class="btn-reset" onclick="reinitialiserTout()">Réinitialiser toutes les notes</button>
 
     <div class="signature">Développé par Daouda Soumaré</div>
 </div>
 
-<div id="history-modal">
+<div id="history-modal" class="modal">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h3 style="margin:0">Historique</h3>
-            <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.5rem;">✕</button>
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <h3>Historique</h3>
+            <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.5rem; color:var(--text); cursor:pointer;">✕</button>
         </div>
-        <div id="history-list"></div>
-        <button onclick="clearAllHistory()" style="width:100%; margin-top:20px; color:red; border:none; background:none; font-size:0.8rem; cursor:pointer;">Vider l'historique</button>
+        <div id="history-list" style="max-height: 250px; overflow-y: auto;"></div>
+        <button onclick="clearHistory()" style="width:100%; margin-top:20px; color:var(--accent); border:1px solid var(--accent); background:none; padding:10px; border-radius:10px; font-size:0.8rem; cursor:pointer;">🗑️ Vider l'historique</button>
+    </div>
+</div>
+
+<div id="settings-modal" class="modal">
+    <div class="modal-content">
+        <h3 style="text-align: center;">Thèmes de l'app</h3>
+        <p style="font-size: 0.85rem; color: var(--text-light); text-align: center;">Choisissez votre couleur préférée :</p>
+        <div class="theme-selector">
+            <div class="theme-dot" style="background: #00853f;" title="Vert" onclick="setTheme('green')"></div>
+            <div class="theme-dot" style="background: #2563eb;" title="Bleu" onclick="setTheme('blue')"></div>
+            <div class="theme-dot" style="background: #f97316;" title="Orange" onclick="setTheme('orange')"></div>
+            <div class="theme-dot" style="background: #db2777;" title="Rose" onclick="setTheme('pink')"></div>
+            <div class="theme-dot" style="background: #7c3aed;" title="Violet" onclick="setTheme('purple')"></div>
+            <div class="theme-dot" style="background: #eab308;" title="Jaune" onclick="setTheme('yellow')"></div>
+            <div class="theme-dot" style="background: #dc2626;" title="Rouge" onclick="setTheme('red')"></div>
+            <div class="theme-dot" style="background: #0891b2;" title="Cyan" onclick="setTheme('cyan')"></div>
+            <div class="theme-dot" style="background: #334155;" title="Gris" onclick="setTheme('dark')"></div>
+        </div>
+        <button onclick="closeSettings()" class="btn-calc" style="padding: 12px; margin-top: 10px;">Valider</button>
     </div>
 </div>
 
 <script>
-    let matieres = JSON.parse(localStorage.getItem('notesDevoirsPro')) || [{nom: 'Maths', coef: 5, d1:'', d2:'', comp:''}];
-    let historique = JSON.parse(localStorage.getItem('historyPro')) || [];
+    let matieres = JSON.parse(localStorage.getItem('notesSavedDevoirs')) || [{nom: 'Mathématiques', coef: 5, d1:'', d2:'', comp:''}];
+    let historique = JSON.parse(localStorage.getItem('moyenneHistory')) || [];
 
     function initialiser() {
+        if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode');
+        const savedTheme = localStorage.getItem('appTheme');
+        if (savedTheme) setTheme(savedTheme);
+
         const list = document.getElementById('liste-matieres');
         list.innerHTML = '';
         matieres.forEach(m => creerLigne(m));
-        calculerMoyenne(false);
     }
 
     function creerLigne(data) {
@@ -163,26 +186,18 @@
             <div class="subject-header">
                 <input type="text" value="${data.nom}" placeholder="Matière" class="m-name" oninput="sauver()">
                 <input type="number" value="${data.coef}" placeholder="Coef" class="m-coef" oninput="sauver()">
-                <button onclick="this.parentElement.parentElement.remove(); sauver();" style="border:none; background:none; color:red; font-weight:bold; cursor:pointer; font-size:1.2rem;">×</button>
+                <button onclick="this.parentElement.parentElement.remove(); sauver();" style="border:none; background:none; color:var(--accent); font-weight:bold; cursor:pointer;">✕</button>
             </div>
             <div class="notes-grid">
-                <div class="note-field"><label>Devoir 1</label><input type="number" step="0.01" value="${data.d1}" class="m-d1" oninput="validerNote(this)"></div>
-                <div class="note-field"><label>Devoir 2</label><input type="number" step="0.01" value="${data.d2}" class="m-d2" oninput="validerNote(this)"></div>
-                <div class="note-field"><label>Composition</label><input type="number" step="0.01" value="${data.comp}" class="m-comp" oninput="validerNote(this)"></div>
+                <div class="note-field"><label>Devoir 1</label><input type="number" step="0.01" value="${data.d1 || ''}" class="m-d1" oninput="sauver()"></div>
+                <div class="note-field"><label>Devoir 2</label><input type="number" step="0.01" value="${data.d2 || ''}" class="m-d2" oninput="sauver()"></div>
+                <div class="note-field"><label>Compo</label><input type="number" step="0.01" value="${data.comp || ''}" class="m-comp" oninput="sauver()"></div>
             </div>
         `;
         document.getElementById('liste-matieres').appendChild(div);
     }
 
-    function validerNote(input) {
-        if (input.value !== "") {
-            if (input.value > 20) input.value = 20;
-            if (input.value < 0) input.value = 0;
-        }
-        sauver();
-    }
-
-    function ajouterLigne() { creerLigne({nom:'', coef:2, d1:'', d2:'', comp:''}); sauver(); }
+    function ajouterLigne() { creerLigne({nom:'', coef:1, d1:'', d2:'', comp:''}); sauver(); }
 
     function sauver() {
         let data = [];
@@ -195,111 +210,79 @@
                 comp: card.querySelector('.m-comp').value
             });
         });
-        localStorage.setItem('notesDevoirsPro', JSON.stringify(data));
-        calculerMoyenne(false);
+        localStorage.setItem('notesSavedDevoirs', JSON.stringify(data));
     }
 
-    function calculerMoyenne(estCalculFinal = false) {
-        let totalPoints = 0, totalCoef = 0, pointsManquants = 0, coefManquants = 0;
-        const target = parseFloat(document.getElementById('target-moyenne').value) || 12;
+    function reinitialiserTout() {
+        if(confirm("Effacer toutes les notes ?")) {
+            localStorage.removeItem('notesSavedDevoirs');
+            matieres = [{nom: 'Mathématiques', coef: 5, d1:'', d2:'', comp:''}];
+            initialiser();
+            document.getElementById('moyenne-generale').textContent = "--";
+        }
+    }
 
+    function clearHistory() {
+        if(confirm("Voulez-vous vraiment vider tout l'historique ?")) {
+            historique = [];
+            localStorage.removeItem('moyenneHistory');
+            toggleHistory(); // Rafraîchir l'affichage (fermera et rouvrira ou videra)
+            toggleHistory();
+        }
+    }
+
+    function calculerMoyenne() {
+        let totalPoints = 0; let totalCoef = 0;
         document.querySelectorAll('.subject-card').forEach(card => {
             const coef = parseFloat(card.querySelector('.m-coef').value) || 0;
             const d1 = parseFloat(card.querySelector('.m-d1').value);
             const d2 = parseFloat(card.querySelector('.m-d2').value);
             const comp = parseFloat(card.querySelector('.m-comp').value);
 
-            if (coef > 0) {
-                if (!isNaN(d1) && !isNaN(d2)) {
-                    const moyClasse = (d1 + d2) / 2;
-                    if (isNaN(comp)) {
-                        const compoRequise = (target * 2) - moyClasse;
-                        pointsManquants += (compoRequise * coef);
-                        coefManquants += coef;
-                    } else {
-                        totalPoints += (((moyClasse + comp) / 2) * coef);
-                        totalCoef += coef;
-                    }
-                }
+            if (!isNaN(d1) && !isNaN(d2) && !isNaN(comp) && coef > 0) {
+                const moyMatiere = (((d1 + d2) / 2) + comp) / 2;
+                totalPoints += (moyMatiere * coef);
+                totalCoef += coef;
             }
         });
-
-        // Affichage de l'objectif et message d'encouragement
-        const alertDiv = document.getElementById('top-alert');
-        if (coefManquants > 0) {
-            const noteCible = pointsManquants / coefManquants;
-            let message = "";
-            
-            if (noteCible <= 10) message = "C'est largement à ta portée ! Courage ✊";
-            else if (noteCible <= 13) message = "Travaille sérieusement et tu y arriveras ! 📚";
-            else if (noteCible <= 16) message = "Il va falloir donner le meilleur de toi-même ! 🔥";
-            else if (noteCible <= 20) message = "Gros défi en vue, concentre-toi au maximum ! 🎯";
-            else message = "Objectif très difficile, renforce tes autres matières ! ⚠️";
-
-            alertDiv.style.display = "block";
-            alertDiv.innerHTML = `<div class="alert-box">
-                🎯 Objectif : ${noteCible.toFixed(2)} en composition<br>
-                <span style="font-size:0.8rem; font-weight:normal;">${message}</span>
-            </div>`;
-        } else {
-            alertDiv.style.display = "none";
-        }
 
         if (totalCoef > 0) {
             const finale = (totalPoints / totalCoef).toFixed(2);
             document.getElementById('moyenne-generale').textContent = finale;
-
-            if (estCalculFinal) {
-                const card = document.getElementById('main-card');
-                const ment = document.getElementById('mention');
-                card.className = "header-card " + (finale < 10 ? "red" : finale < 12 ? "orange" : finale < 14 ? "yellow" : "green-success");
-                ment.textContent = finale >= 16 ? "EXCELLENT !" : finale >= 14 ? "TRÈS BIEN !" : finale >= 12 ? "ASSEZ BIEN" : finale >= 10 ? "PASSABLE" : "ENCOURAGEMENTS";
-                
-                historique.unshift({ score: finale, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
-                localStorage.setItem('historyPro', JSON.stringify(historique.slice(0, 15)));
-                alert("Moyenne enregistrée avec succès !");
-            }
-        }
+            document.getElementById('info-coef').textContent = `Total Coefficients : ${totalCoef}`;
+            historique.unshift({ score: finale, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
+            localStorage.setItem('moyenneHistory', JSON.stringify(historique.slice(0, 15)));
+        } else { alert("Remplissez une ligne complète !"); }
     }
 
-    function resetApp() {
-        if(confirm("Voulez-vous vraiment vider toutes les notes ?")) {
-            localStorage.removeItem('notesDevoirsPro');
-            matieres = [{nom: 'Maths', coef: 5, d1:'', d2:'', comp:''}];
-            initialiser();
-            document.getElementById('moyenne-generale').textContent = "--";
-            document.getElementById('main-card').className = "header-card";
-            document.getElementById('mention').textContent = "";
-        }
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
     }
+
+    function setTheme(theme) {
+        document.body.classList.remove('theme-blue', 'theme-orange', 'theme-pink', 'theme-purple', 'theme-yellow', 'theme-red', 'theme-cyan', 'theme-dark');
+        if (theme !== 'green') document.body.classList.add('theme-' + theme);
+        localStorage.setItem('appTheme', theme);
+        const color = getComputedStyle(document.body).getPropertyValue('--primary').trim();
+        document.getElementById('theme-meta').setAttribute('content', color);
+    }
+
+    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+    function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
 
     function toggleHistory() {
         const modal = document.getElementById('history-modal');
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-        renderHistory();
-    }
-
-    function renderHistory() {
         const list = document.getElementById('history-list');
-        list.innerHTML = historique.map((h, i) => `
-            <div class="history-item">
-                <div><b>${h.score}</b> <small style="color:#888; margin-left:10px;">${h.date}</small></div>
-                <button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteHistoryItem(${i})">🗑️</button>
-            </div>
-        `).join('') || '<p style="text-align:center; color:#888">Historique vide</p>';
+        list.innerHTML = historique.length > 0 
+            ? historique.map(h => `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);"><span><b>${h.score}</b></span><span style="font-size:0.8rem; color:var(--text-light);">${h.date}</span></div>`).join('')
+            : '<p style="text-align:center; color:var(--text-light); font-size:0.9rem;">Aucun historique disponible.</p>';
     }
-
-    function deleteHistoryItem(index) {
-        historique.splice(index, 1);
-        localStorage.setItem('historyPro', JSON.stringify(historique));
-        renderHistory();
-    }
-
-    function clearAllHistory() { if(confirm("Effacer tout l'historique ?")) { historique = []; localStorage.removeItem('historyPro'); renderHistory(); } }
 
     async function shareApp() {
         if (navigator.share) {
-            try { await navigator.share({ title: 'Calculateur Sénégal', text: 'Vise tes notes avec mon app !', url: window.location.href }); } catch (err) {}
+            try { await navigator.share({ title: 'Calculateur Sénégal', text: 'Calcule tes notes facilement !', url: window.location.href }); } catch (err) {}
         }
     }
 
