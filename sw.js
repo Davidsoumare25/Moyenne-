@@ -1,4 +1,4 @@
-const CACHE_NAME = 'moyenne-sn-v2'; // Change v1 en v2 ici
+const CACHE_NAME = 'moyenne-sn-v3'; // Change v1 en v2 ici
 const ASSETS = [
   './',
   './index.html',
