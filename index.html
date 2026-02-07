@@ -10,7 +10,6 @@
         :root {
             --primary: #00853f;
             --accent: #e31b23;
-            --yellow: #fdef42;
             --bg: #f1f5f9;
         }
 
@@ -31,20 +30,25 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer;
         }
 
+        /* En-tête : Reste vert par défaut */
         .header-card {
             background: linear-gradient(135deg, var(--primary), #005f2d);
             color: white; padding: 25px; border-radius: 25px;
             text-align: center; margin-bottom: 15px;
-            transition: all 0.5s ease;
+            transition: all 0.6s ease;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
+        /* Classes de couleurs appliquées APRES calcul */
         .header-card.red { background: linear-gradient(135deg, #e31b23, #991b1b); }
         .header-card.orange { background: linear-gradient(135deg, #f97316, #c2410c); }
         .header-card.yellow { background: linear-gradient(135deg, #eab308, #a16207); }
-        .header-card.green { background: linear-gradient(135deg, #00853f, #166534); }
+        .header-card.green-success { background: linear-gradient(135deg, #00853f, #166534); }
 
         #moyenne-generale { font-size: 3.5rem; font-weight: 900; margin: 5px 0; color: white; }
+        
+        /* Nouveau style pour l'objectif dans le bandeau */
+        #obj-display { font-size: 0.9rem; margin-top: 10px; font-weight: 500; opacity: 0.9; display: none; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 10px; }
 
         .goal-box {
             background: #fff; padding: 15px; border-radius: 15px;
@@ -56,7 +60,6 @@
         .subject-card {
             background: white; padding: 15px; border-radius: 20px;
             margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            position: relative;
         }
 
         .subject-header { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
@@ -67,8 +70,6 @@
         .note-field { display: flex; flex-direction: column; }
         .note-field label { font-size: 0.6rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
         .note-field input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 10px; text-align: center; font-weight: bold; }
-
-        .missing-info { font-size: 0.75rem; color: var(--accent); margin-top: 10px; font-weight: 600; display: none; padding: 5px; background: #fff1f2; border-radius: 5px; }
 
         .btn-calc {
             width: 100%; padding: 20px; background: var(--primary);
@@ -83,7 +84,6 @@
         }
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 25px; max-height: 80vh; overflow-y: auto; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f1f5f9; }
-        .del-history-btn { color: #ef4444; background: none; border: none; font-size: 1.1rem; }
 
         .signature { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-top: 30px; }
     </style>
@@ -100,6 +100,7 @@
         <span style="font-size: 0.8rem; letter-spacing: 1px;">MOYENNE GÉNÉRALE</span>
         <div id="moyenne-generale">--</div>
         <div id="mention" style="font-weight: bold; font-size: 0.9rem;"></div>
+        <div id="obj-display"></div>
     </div>
 
     <div class="goal-box">
@@ -110,7 +111,6 @@
     <div id="liste-matieres"></div>
 
     <button class="tool-btn" style="width:100%; border-radius:15px; margin-bottom:10px;" onclick="ajouterLigne()">+ Ajouter une matière</button>
-    
     <button class="btn-calc" onclick="calculerMoyenne(true)">CALCULER & ENREGISTRER</button>
 
     <div class="signature">Développé par Daouda Soumaré</div>
@@ -135,7 +135,6 @@
         const list = document.getElementById('liste-matieres');
         list.innerHTML = '';
         matieres.forEach(m => creerLigne(m));
-        calculerMoyenne(false);
     }
 
     function creerLigne(data) {
@@ -152,16 +151,12 @@
                 <div class="note-field"><label>Devoir 2</label><input type="number" step="0.01" value="${data.d2}" class="m-d2" oninput="validerNote(this)"></div>
                 <div class="note-field"><label>Composition</label><input type="number" step="0.01" value="${data.comp}" class="m-comp" oninput="validerNote(this)"></div>
             </div>
-            <div class="missing-info"></div>
         `;
         document.getElementById('liste-matieres').appendChild(div);
     }
 
-    // Sécurité Anti-erreur : bloque les notes > 20
     function validerNote(input) {
-        if (input.value > 20) {
-            input.value = 20;
-        }
+        if (input.value > 20) input.value = 20;
         if (input.value < 0) input.value = 0;
         sauver();
     }
@@ -180,12 +175,10 @@
             });
         });
         localStorage.setItem('notesDevoirsPro', JSON.stringify(data));
-        calculerMoyenne(false);
     }
 
-    function calculerMoyenne(modeAction = false) {
-        let totalPoints = 0;
-        let totalCoef = 0;
+    function calculerMoyenne(estCalculFinal = false) {
+        let totalPoints = 0, totalCoef = 0, pointsManquantsTotal = 0;
         const target = parseFloat(document.getElementById('target-moyenne').value) || 12;
 
         document.querySelectorAll('.subject-card').forEach(card => {
@@ -193,45 +186,45 @@
             const d1 = parseFloat(card.querySelector('.m-d1').value);
             const d2 = parseFloat(card.querySelector('.m-d2').value);
             const comp = parseFloat(card.querySelector('.m-comp').value);
-            const missingDiv = card.querySelector('.missing-info');
-
-            missingDiv.style.display = 'none';
 
             if (!isNaN(d1) && !isNaN(d2) && coef > 0) {
                 const moyClasse = (d1 + d2) / 2;
-                
                 if (isNaN(comp)) {
-                    // N'affiche l'objectif rouge QUE si on clique sur le bouton
-                    if(modeAction) {
-                        const compoReq = (target * 2) - moyClasse;
-                        missingDiv.style.display = 'block';
-                        missingDiv.innerHTML = `💡 Note de compo requise : <b>${compoReq.toFixed(2)}</b>`;
-                    }
+                    // Si pas de compo, on calcule ce qu'il faut pour la matière
+                    const compoRequise = (target * 2) - moyClasse;
+                    pointsManquantsTotal = compoRequise; 
                 } else {
-                    const moyMatiere = (moyClasse + comp) / 2;
-                    totalPoints += (moyMatiere * coef);
+                    totalPoints += (((moyClasse + comp) / 2) * coef);
                     totalCoef += coef;
                 }
             }
         });
 
-        const res = document.getElementById('moyenne-generale');
-        const cardHeader = document.getElementById('main-card');
-        const ment = document.getElementById('mention');
+        if (estCalculFinal && totalCoef > 0) {
+            const finale = (totalPoints / totalCoef).toFixed(2);
+            const res = document.getElementById('moyenne-generale');
+            const card = document.getElementById('main-card');
+            const ment = document.getElementById('mention');
+            const objDiv = document.getElementById('obj-display');
 
-        if (totalCoef > 0) {
-            const finale = totalPoints / totalCoef;
-            res.textContent = finale.toFixed(2);
+            res.textContent = finale;
             
-            // Changement de couleur dynamique
-            cardHeader.className = "header-card " + (finale < 10 ? "red" : finale < 12 ? "orange" : finale < 14 ? "yellow" : "green");
+            // Changement de couleur UNIQUEMENT après clic
+            card.className = "header-card " + (finale < 10 ? "red" : finale < 12 ? "orange" : finale < 14 ? "yellow" : "green-success");
             ment.textContent = finale >= 16 ? "EXCELLENT !" : finale >= 14 ? "TRÈS BIEN !" : finale >= 12 ? "ASSEZ BIEN" : finale >= 10 ? "PASSABLE" : "ENCOURAGEMENTS";
 
-            if (modeAction) {
-                historique.unshift({ score: finale.toFixed(2), date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
-                localStorage.setItem('historyPro', JSON.stringify(historique.slice(0, 15)));
-                alert("Moyenne de " + finale.toFixed(2) + " enregistrée !");
+            // Affichage de l'objectif dans le bandeau
+            if (pointsManquantsTotal !== 0) {
+                objDiv.style.display = "inline-block";
+                objDiv.innerHTML = `🎯 Objectif : <b>${pointsManquantsTotal.toFixed(2)}</b> en composition`;
+            } else {
+                objDiv.style.display = "none";
             }
+
+            // Enregistrement historique
+            historique.unshift({ score: finale, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
+            localStorage.setItem('historyPro', JSON.stringify(historique.slice(0, 15)));
+            alert("Moyenne enregistrée !");
         }
     }
 
@@ -246,9 +239,9 @@
         list.innerHTML = historique.map((h, i) => `
             <div class="history-item">
                 <div><b>${h.score}</b> <small style="color:#888; margin-left:10px;">${h.date}</small></div>
-                <button class="del-history-btn" onclick="deleteHistoryItem(${i})">🗑️</button>
+                <button style="color:red; background:none; border:none;" onclick="deleteHistoryItem(${i})">🗑️</button>
             </div>
-        `).join('') || '<p style="text-align:center; color:#888">Aucun historique</p>';
+        `).join('') || '<p style="text-align:center; color:#888">Vide</p>';
     }
 
     function deleteHistoryItem(index) {
@@ -257,9 +250,7 @@
         renderHistory();
     }
 
-    function clearAllHistory() {
-        if(confirm("Tout effacer ?")) { historique = []; localStorage.removeItem('historyPro'); renderHistory(); }
-    }
+    function clearAllHistory() { if(confirm("Tout effacer ?")) { historique = []; localStorage.removeItem('historyPro'); renderHistory(); } }
 
     async function shareApp() {
         if (navigator.share) {
