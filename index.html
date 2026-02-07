@@ -19,6 +19,7 @@
             --border: #e2e8f0;
         }
 
+        /* Thèmes */
         body.theme-blue { --primary: #2563eb; --primary-dark: #1e40af; }
         body.theme-orange { --primary: #f97316; --primary-dark: #c2410c; }
         body.theme-pink { --primary: #db2777; --primary-dark: #9d174d; }
@@ -29,26 +30,30 @@
         body.theme-dark { --primary: #334155; --primary-dark: #0f172a; }
 
         body.dark-mode {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f8fafc;
-            --text-light: #94a3b8;
-            --border: #334155;
+            --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc;
+            --text-light: #94a3b8; --border: #334155;
         }
 
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0; padding: 10px;
-            display: flex; flex-direction: column; align-items: center;
-            transition: background 0.3s ease;
+            background-color: var(--bg); color: var(--text);
+            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center;
+            transition: all 0.3s ease; overflow-x: hidden;
         }
+
+        /* BANDEAU DE NOTIFICATION INTERNE */
+        #custom-toast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: var(--card-bg);
+            border-radius: 15px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 9999; display: flex; align-items: center; gap: 12px;
+            border-bottom: 4px solid var(--primary); transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #custom-toast.show { top: 20px; }
 
         .container { width: 100%; max-width: 500px; padding-bottom: 60px; }
 
         .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 15px; }
-
         .tool-btn {
             background: var(--card-bg); border: none; border-radius: 12px;
             width: 42px; height: 42px; font-size: 1.1rem; color: var(--text);
@@ -58,8 +63,7 @@
         .header-card {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white; padding: 20px; border-radius: 25px;
-            text-align: center; margin-bottom: 20px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            text-align: center; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
 
         #moyenne-generale { font-size: 3rem; font-weight: 900; margin: 5px 0; color: var(--yellow); }
@@ -71,41 +75,43 @@
         }
 
         .subject-header { display: flex; gap: 8px; margin-bottom: 10px; }
-        .subject-header input[type="text"] { 
-            flex: 2; font-weight: bold; border: none; 
-            border-bottom: 2px solid var(--border); 
-            background: transparent; color: var(--text);
-            font-size: 0.95rem;
-        }
-        .subject-header input[type="number"] { 
-            width: 50px; text-align: center; background: var(--bg); 
-            border-radius: 8px; border: none; color: var(--text); font-weight: bold;
+        .subject-header input { 
+            background: transparent; color: var(--text); border: none; 
+            border-bottom: 2px solid var(--border); font-weight: bold;
         }
 
         .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .note-field { display: flex; flex-direction: column; min-width: 0; }
-        .note-field label { font-size: 0.6rem; color: var(--text-light); font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
-        .note-field input { width: 100%; padding: 8px 4px; border: 1px solid var(--border); border-radius: 8px; text-align: center; font-weight: bold; background: var(--bg); color: var(--text); box-sizing: border-box; }
+        .note-field label { font-size: 0.6rem; color: var(--text-light); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+        .note-field input { 
+            width: 100%; padding: 10px 5px; border: 1px solid var(--border); 
+            border-radius: 8px; text-align: center; font-weight: bold;
+            background: var(--bg); color: var(--text); box-sizing: border-box;
+        }
 
         .btn-calc {
             width: 100%; padding: 18px; background: var(--primary);
             color: white; border: none; border-radius: 18px;
-            font-size: 1.1rem; font-weight: bold; margin: 15px 0;
-            cursor: pointer;
+            font-size: 1.1rem; font-weight: bold; margin: 15px 0; cursor: pointer;
         }
 
-        .btn-reset { background: none; border: none; color: var(--accent); text-decoration: underline; font-size: 0.8rem; cursor: pointer; width: 100%; margin-top: 5px; }
-
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); width: 85%; max-width: 350px; padding: 25px; border-radius: 25px; color: var(--text); position: relative; }
-
-        .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; justify-items: center; }
-        .theme-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .modal-content { background: var(--card-bg); width: 85%; max-width: 350px; padding: 25px; border-radius: 25px; color: var(--text); }
+        .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; }
+        .theme-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         .signature { text-align: center; font-size: 0.8rem; color: var(--text-light); margin-top: 20px; }
     </style>
 </head>
 <body id="app-body">
+
+    <div id="custom-toast">
+        <div id="toast-icon" style="font-size: 1.5rem;">🎓</div>
+        <div>
+            <div id="toast-title" style="font-weight: bold; font-size: 0.9rem;">Résultat calculé !</div>
+            <div id="toast-body" style="font-size: 0.8rem; color: var(--text-light);">Ta moyenne est prête.</div>
+        </div>
+    </div>
 
 <div class="container">
     <div class="top-tools">
@@ -127,7 +133,7 @@
 
     <button class="tool-btn" style="width:100%; border-radius:15px; font-size: 0.85rem;" onclick="ajouterLigne()">+ Ajouter une matière</button>
     <button class="btn-calc" onclick="calculerMoyenne()">CALCULER LA MOYENNE</button>
-    <button class="btn-reset" onclick="reinitialiserTout()">Réinitialiser toutes les notes</button>
+    <button onclick="reinitialiserTout()" style="background:none; border:none; color:var(--accent); text-decoration:underline; font-size:0.8rem; cursor:pointer; width:100%;">Réinitialiser toutes les notes</button>
 
     <div class="signature">Développé par Daouda Soumaré</div>
 </div>
@@ -136,7 +142,7 @@
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
             <h3>Historique</h3>
-            <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.5rem; color:var(--text); cursor:pointer;">✕</button>
+            <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.5rem; color:var(--text);">✕</button>
         </div>
         <div id="history-list" style="max-height: 250px; overflow-y: auto;"></div>
         <button onclick="clearHistory()" style="width:100%; margin-top:20px; color:var(--accent); border:1px solid var(--accent); background:none; padding:10px; border-radius:10px; font-size:0.8rem; cursor:pointer;">🗑️ Vider l'historique</button>
@@ -145,7 +151,7 @@
 
 <div id="settings-modal" class="modal">
     <div class="modal-content">
-        <h3 style="text-align: center;">Thèmes de l'app</h3>
+        <h3 style="text-align:center;">Thèmes</h3>
         <div class="theme-selector">
             <div class="theme-dot" style="background: #00853f;" onclick="setTheme('green')"></div>
             <div class="theme-dot" style="background: #2563eb;" onclick="setTheme('blue')"></div>
@@ -157,38 +163,37 @@
             <div class="theme-dot" style="background: #0891b2;" onclick="setTheme('cyan')"></div>
             <div class="theme-dot" style="background: #334155;" onclick="setTheme('dark')"></div>
         </div>
-        <button onclick="closeSettings()" class="btn-calc" style="padding: 12px; margin-top: 10px;">Valider</button>
+        <button onclick="closeSettings()" class="btn-calc" style="padding: 10px;">Valider</button>
     </div>
 </div>
 
 <script>
-    let matieres = JSON.parse(localStorage.getItem('notesSavedDevoirs')) || [{nom: 'Mathématiques', coef: 5, d1:'', d2:'', comp:''}];
+    let matieres = JSON.parse(localStorage.getItem('notesSavedDevoirs')) || [{nom: 'Maths', coef: 5, d1:'', d2:'', comp:''}];
     let historique = JSON.parse(localStorage.getItem('moyenneHistory')) || [];
 
-    // --- LOGIQUE NOTIFICATIONS ---
-    function demanderPermissionNotif() {
-        if ("Notification" in window) {
-            Notification.requestPermission();
-        }
-    }
+    function showToast(moyenne) {
+        const toast = document.getElementById('custom-toast');
+        const title = document.getElementById('toast-title');
+        const body = document.getElementById('toast-body');
+        const icon = document.getElementById('toast-icon');
 
-    function envoyerNotification(moyenne) {
-        if ("Notification" in window && Notification.permission === "granted") {
-            let mention = moyenne >= 16 ? "Excellent ! 🌟" : moyenne >= 12 ? "Félicitations ! 👍" : "Continue tes efforts ! 💪";
-            new Notification("Calculateur Sénégal Pro", {
-                body: `Ta moyenne est de ${moyenne}/20. ${mention}`,
-                icon: "https://cdn-icons-png.flaticon.com/512/190/190411.png"
-            });
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-        }
+        let mention = moyenne >= 16 ? "Excellent ! 🌟" : moyenne >= 12 ? "Très bien ! 👍" : "Passable, courage ! 💪";
+        let emoji = moyenne >= 12 ? "🎉" : "📚";
+
+        title.innerText = `Moyenne : ${moyenne}/20`;
+        body.innerText = mention;
+        icon.innerText = emoji;
+
+        toast.classList.add('show');
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+        setTimeout(() => { toast.classList.remove('show'); }, 4000);
     }
 
     function initialiser() {
-        demanderPermissionNotif();
         if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode');
         const savedTheme = localStorage.getItem('appTheme');
         if (savedTheme) setTheme(savedTheme);
-
         const list = document.getElementById('liste-matieres');
         list.innerHTML = '';
         matieres.forEach(m => creerLigne(m));
@@ -199,13 +204,13 @@
         div.className = 'subject-card';
         div.innerHTML = `
             <div class="subject-header">
-                <input type="text" value="${data.nom}" placeholder="Matière" class="m-name" oninput="sauver()">
-                <input type="number" value="${data.coef}" placeholder="Coef" class="m-coef" oninput="sauver()">
-                <button onclick="this.parentElement.parentElement.remove(); sauver();" style="border:none; background:none; color:var(--accent); font-weight:bold; cursor:pointer;">✕</button>
+                <input type="text" value="${data.nom}" class="m-name" oninput="sauver()">
+                <input type="number" value="${data.coef}" class="m-coef" oninput="sauver()">
+                <button onclick="this.parentElement.parentElement.remove(); sauver();" style="border:none; background:none; color:var(--accent); font-weight:bold;">✕</button>
             </div>
             <div class="notes-grid">
-                <div class="note-field"><label>Devoir 1</label><input type="number" step="0.01" value="${data.d1 || ''}" class="m-d1" oninput="sauver()"></div>
-                <div class="note-field"><label>Devoir 2</label><input type="number" step="0.01" value="${data.d2 || ''}" class="m-d2" oninput="sauver()"></div>
+                <div class="note-field"><label>D1</label><input type="number" step="0.01" value="${data.d1 || ''}" class="m-d1" oninput="sauver()"></div>
+                <div class="note-field"><label>D2</label><input type="number" step="0.01" value="${data.d2 || ''}" class="m-d2" oninput="sauver()"></div>
                 <div class="note-field"><label>Compo</label><input type="number" step="0.01" value="${data.comp || ''}" class="m-comp" oninput="sauver()"></div>
             </div>
         `;
@@ -228,23 +233,6 @@
         localStorage.setItem('notesSavedDevoirs', JSON.stringify(data));
     }
 
-    function reinitialiserTout() {
-        if(confirm("Effacer toutes les notes ?")) {
-            localStorage.removeItem('notesSavedDevoirs');
-            matieres = [{nom: 'Mathématiques', coef: 5, d1:'', d2:'', comp:''}];
-            initialiser();
-            document.getElementById('moyenne-generale').textContent = "--";
-        }
-    }
-
-    function clearHistory() {
-        if(confirm("Vider l'historique ?")) {
-            historique = [];
-            localStorage.removeItem('moyenneHistory');
-            toggleHistory(); toggleHistory();
-        }
-    }
-
     function calculerMoyenne() {
         let totalPoints = 0; let totalCoef = 0;
         document.querySelectorAll('.subject-card').forEach(card => {
@@ -263,21 +251,18 @@
         if (totalCoef > 0) {
             const finale = (totalPoints / totalCoef).toFixed(2);
             document.getElementById('moyenne-generale').textContent = finale;
-            document.getElementById('info-coef').textContent = `Total Coefficients : ${totalCoef}`;
-            
-            // Envoyer la notification
-            envoyerNotification(finale);
-
+            document.getElementById('info-coef').textContent = `Coefficients : ${totalCoef}`;
+            showToast(finale);
             historique.unshift({ score: finale, date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
             localStorage.setItem('moyenneHistory', JSON.stringify(historique.slice(0, 15)));
-        } else { alert("Remplissez une ligne complète !"); }
+        } else { alert("Données incomplètes !"); }
     }
 
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
-    }
-
+    function reinitialiserTout() { if(confirm("Vider les notes ?")) { localStorage.removeItem('notesSavedDevoirs'); matieres = [{nom:'Maths', coef:5}]; initialiser(); document.getElementById('moyenne-generale').textContent = "--"; } }
+    function clearHistory() { if(confirm("Vider l'historique ?")) { historique = []; localStorage.removeItem('moyenneHistory'); toggleHistory(); toggleHistory(); } }
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled'); }
+    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+    function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
     function setTheme(theme) {
         document.body.classList.remove('theme-blue', 'theme-orange', 'theme-pink', 'theme-purple', 'theme-yellow', 'theme-red', 'theme-cyan', 'theme-dark');
         if (theme !== 'green') document.body.classList.add('theme-' + theme);
@@ -285,25 +270,13 @@
         const color = getComputedStyle(document.body).getPropertyValue('--primary').trim();
         document.getElementById('theme-meta').setAttribute('content', color);
     }
-
-    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
-    function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
-
     function toggleHistory() {
         const modal = document.getElementById('history-modal');
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
         const list = document.getElementById('history-list');
-        list.innerHTML = historique.length > 0 
-            ? historique.map(h => `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);"><span><b>${h.score}</b></span><span style="font-size:0.8rem; color:var(--text-light);">${h.date}</span></div>`).join('')
-            : '<p style="text-align:center; color:var(--text-light);">Historique vide.</p>';
+        list.innerHTML = historique.length > 0 ? historique.map(h => `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);"><span><b>${h.score}</b></span><span style="font-size:0.8rem; color:var(--text-light);">${h.date}</span></div>`).join('') : '<p>Vide.</p>';
     }
-
-    async function shareApp() {
-        if (navigator.share) {
-            try { await navigator.share({ title: 'Calculateur Sénégal', text: 'Mon app de notes !', url: window.location.href }); } catch (err) {}
-        }
-    }
-
+    async function shareApp() { if (navigator.share) { try { await navigator.share({ title: 'Calculateur Sénégal', text: 'Mes notes !', url: window.location.href }); } catch (err) {} } }
     initialiser();
 </script>
 </body>
