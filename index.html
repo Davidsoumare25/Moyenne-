@@ -31,12 +31,11 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer;
         }
 
-        /* En-tête Dynamique */
         .header-card {
             background: linear-gradient(135deg, var(--primary), #005f2d);
             color: white; padding: 25px; border-radius: 25px;
             text-align: center; margin-bottom: 15px;
-            transition: background 0.5s ease;
+            transition: all 0.5s ease;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
@@ -45,9 +44,8 @@
         .header-card.yellow { background: linear-gradient(135deg, #eab308, #a16207); }
         .header-card.green { background: linear-gradient(135deg, #00853f, #166534); }
 
-        #moyenne-generale { font-size: 3.5rem; font-weight: 900; margin: 5px 0; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        #moyenne-generale { font-size: 3.5rem; font-weight: 900; margin: 5px 0; color: white; }
 
-        /* Simulateur d'objectif */
         .goal-box {
             background: #fff; padding: 15px; border-radius: 15px;
             margin-bottom: 15px; border: 2px dashed var(--primary);
@@ -70,23 +68,22 @@
         .note-field label { font-size: 0.6rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
         .note-field input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 10px; text-align: center; font-weight: bold; }
 
-        .missing-info { font-size: 0.75rem; color: var(--accent); margin-top: 10px; font-weight: 500; display: none; }
+        .missing-info { font-size: 0.75rem; color: var(--accent); margin-top: 10px; font-weight: 600; display: none; padding: 5px; background: #fff1f2; border-radius: 5px; }
 
         .btn-calc {
             width: 100%; padding: 20px; background: var(--primary);
             color: white; border: none; border-radius: 20px;
             font-size: 1.2rem; font-weight: bold; margin: 10px 0;
-            box-shadow: 0 4px 12px rgba(0,133,63,0.3);
+            box-shadow: 0 4px 12px rgba(0,133,63,0.3); cursor: pointer;
         }
 
-        /* Modal Historique */
         #history-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
         }
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 25px; max-height: 80vh; overflow-y: auto; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f1f5f9; }
-        .del-history-btn { color: #ef4444; background: none; border: none; cursor: pointer; font-size: 1.1rem; }
+        .del-history-btn { color: #ef4444; background: none; border: none; font-size: 1.1rem; }
 
         .signature { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-top: 30px; }
     </style>
@@ -100,20 +97,21 @@
     </div>
 
     <div class="header-card" id="main-card">
-        <span id="label-moyenne" style="font-size: 0.8rem; letter-spacing: 1px;">MOYENNE GÉNÉRALE</span>
+        <span style="font-size: 0.8rem; letter-spacing: 1px;">MOYENNE GÉNÉRALE</span>
         <div id="moyenne-generale">--</div>
         <div id="mention" style="font-weight: bold; font-size: 0.9rem;"></div>
     </div>
 
     <div class="goal-box">
         <span style="font-size: 0.9rem; font-weight: 600;">🎯 Objectif Moyenne :</span>
-        <input type="number" id="target-moyenne" value="12" step="0.5" oninput="calculerMoyenne()">
+        <input type="number" id="target-moyenne" value="12" min="0" max="20" step="0.5" oninput="sauver()">
     </div>
 
     <div id="liste-matieres"></div>
 
     <button class="tool-btn" style="width:100%; border-radius:15px; margin-bottom:10px;" onclick="ajouterLigne()">+ Ajouter une matière</button>
-    <button class="btn-calc" onclick="calculerMoyenne()">CALCULER & ENREGISTRER</button>
+    
+    <button class="btn-calc" onclick="calculerMoyenne(true)">CALCULER & ENREGISTRER</button>
 
     <div class="signature">Développé par Daouda Soumaré</div>
 </div>
@@ -150,13 +148,22 @@
                 <button onclick="this.parentElement.parentElement.remove(); sauver();" style="border:none; background:none; color:red; font-weight:bold;">✕</button>
             </div>
             <div class="notes-grid">
-                <div class="note-field"><label>Devoir 1</label><input type="number" step="0.01" value="${data.d1}" class="m-d1" oninput="sauver()"></div>
-                <div class="note-field"><label>Devoir 2</label><input type="number" step="0.01" value="${data.d2}" class="m-d2" oninput="sauver()"></div>
-                <div class="note-field"><label>Composition</label><input type="number" step="0.01" value="${data.comp}" class="m-comp" oninput="sauver()"></div>
+                <div class="note-field"><label>Devoir 1</label><input type="number" step="0.01" value="${data.d1}" class="m-d1" oninput="validerNote(this)"></div>
+                <div class="note-field"><label>Devoir 2</label><input type="number" step="0.01" value="${data.d2}" class="m-d2" oninput="validerNote(this)"></div>
+                <div class="note-field"><label>Composition</label><input type="number" step="0.01" value="${data.comp}" class="m-comp" oninput="validerNote(this)"></div>
             </div>
             <div class="missing-info"></div>
         `;
         document.getElementById('liste-matieres').appendChild(div);
+    }
+
+    // Sécurité Anti-erreur : bloque les notes > 20
+    function validerNote(input) {
+        if (input.value > 20) {
+            input.value = 20;
+        }
+        if (input.value < 0) input.value = 0;
+        sauver();
     }
 
     function ajouterLigne() { creerLigne({nom:'', coef:2, d1:'', d2:'', comp:''}); sauver(); }
@@ -176,7 +183,7 @@
         calculerMoyenne(false);
     }
 
-    function calculerMoyenne(saveToHistory = true) {
+    function calculerMoyenne(modeAction = false) {
         let totalPoints = 0;
         let totalCoef = 0;
         const target = parseFloat(document.getElementById('target-moyenne').value) || 12;
@@ -188,19 +195,19 @@
             const comp = parseFloat(card.querySelector('.m-comp').value);
             const missingDiv = card.querySelector('.missing-info');
 
+            missingDiv.style.display = 'none';
+
             if (!isNaN(d1) && !isNaN(d2) && coef > 0) {
                 const moyClasse = (d1 + d2) / 2;
                 
-                // Calcul de la compo manquante pour l'objectif
-                // Formule : target = ( (moyClasse + compoReq) / 2 * coef + autresPoints ) / totalCoef
-                // Approche simplifiée par matière : compoReq = (target * 2) - moyClasse
-                const compoReq = (target * 2) - moyClasse;
-                
                 if (isNaN(comp)) {
-                    missingDiv.style.display = 'block';
-                    missingDiv.innerHTML = `💡 Objectif : <b>${compoReq.toFixed(2)}</b> en compo`;
+                    // N'affiche l'objectif rouge QUE si on clique sur le bouton
+                    if(modeAction) {
+                        const compoReq = (target * 2) - moyClasse;
+                        missingDiv.style.display = 'block';
+                        missingDiv.innerHTML = `💡 Note de compo requise : <b>${compoReq.toFixed(2)}</b>`;
+                    }
                 } else {
-                    missingDiv.style.display = 'none';
                     const moyMatiere = (moyClasse + comp) / 2;
                     totalPoints += (moyMatiere * coef);
                     totalCoef += coef;
@@ -209,20 +216,21 @@
         });
 
         const res = document.getElementById('moyenne-generale');
-        const card = document.getElementById('main-card');
+        const cardHeader = document.getElementById('main-card');
         const ment = document.getElementById('mention');
 
         if (totalCoef > 0) {
             const finale = totalPoints / totalCoef;
             res.textContent = finale.toFixed(2);
             
-            // Design Dynamique
-            card.className = "header-card " + (finale < 10 ? "red" : finale < 12 ? "orange" : finale < 14 ? "yellow" : "green");
+            // Changement de couleur dynamique
+            cardHeader.className = "header-card " + (finale < 10 ? "red" : finale < 12 ? "orange" : finale < 14 ? "yellow" : "green");
             ment.textContent = finale >= 16 ? "EXCELLENT !" : finale >= 14 ? "TRÈS BIEN !" : finale >= 12 ? "ASSEZ BIEN" : finale >= 10 ? "PASSABLE" : "ENCOURAGEMENTS";
 
-            if (saveToHistory && !isNaN(finale)) {
+            if (modeAction) {
                 historique.unshift({ score: finale.toFixed(2), date: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) });
                 localStorage.setItem('historyPro', JSON.stringify(historique.slice(0, 15)));
+                alert("Moyenne de " + finale.toFixed(2) + " enregistrée !");
             }
         }
     }
