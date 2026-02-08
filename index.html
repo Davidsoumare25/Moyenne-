@@ -3,28 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#00853f">
+    <meta name="theme-color" id="meta-theme" content="#00853f">
     <link rel="manifest" href="manifest.json">
-    <title>Calculateur moyenne</title>
+    <title>Calculateur Sénégal Pro</title>
     <style>
         :root {
             --primary: #00853f; --primary-dark: #005f2d; --accent: #e31b23;
             --yellow: #fdef42; --bg: #f8fafc; --card-bg: #ffffff;
             --text: #1e293b; --text-light: #64748b; --border: #e2e8f0;
         }
+
+        /* Thèmes de couleurs */
+        body.t-blue { --primary: #2563eb; --primary-dark: #1e40af; }
+        body.t-red { --primary: #dc2626; --primary-dark: #991b1b; }
+        body.t-purple { --primary: #7c3aed; --primary-dark: #5b21b6; }
+        body.t-orange { --primary: #f97316; --primary-dark: #c2410c; }
+        body.t-pink { --primary: #db2777; --primary-dark: #9d174d; }
+        body.t-cyan { --primary: #0891b2; --primary-dark: #155e75; }
+        body.t-teal { --primary: #0d9488; --primary-dark: #0f766e; }
+        body.t-indigo { --primary: #4f46e5; --primary-dark: #3730a3; }
+        body.t-brown { --primary: #78350f; --primary-dark: #451a03; }
+        body.t-slate { --primary: #475569; --primary-dark: #1e293b; }
+        body.t-lime { --primary: #65a30d; --primary-dark: #3f6212; }
+        body.t-gold { --primary: #b45309; --primary-dark: #78350f; }
+        body.t-rose { --primary: #e11d48; --primary-dark: #9f1239; }
+        body.t-violet { --primary: #8b5cf6; --primary-dark: #6d28d9; }
+        body.t-black { --primary: #18181b; --primary-dark: #000000; }
+
         body.dark-mode { --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --text-light: #94a3b8; --border: #334155; }
+        
         body { font-family: sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; transition: 0.3s; }
-        .container { width: 100%; max-width: 450px; padding-bottom: 80px; }
+        .container { width: 100%; max-width: 450px; padding-bottom: 100px; }
 
-        #custom-toast {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            width: 90%; background: var(--card-bg); padding: 15px; border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 10000;
-            border-bottom: 4px solid var(--primary); transition: 0.5s; display: flex; align-items: center; gap: 10px;
-        }
-        #custom-toast.show { top: 20px; }
-
-        .header-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 25px; border-radius: 25px; text-align: center; margin-bottom: 20px; }
+        .header-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 25px; border-radius: 25px; text-align: center; margin-bottom: 20px; transition: 0.5s; }
         #moyenne-generale { font-size: 3.5rem; font-weight: 900; color: var(--yellow); margin: 10px 0; }
 
         .subject-card { background: var(--card-bg); padding: 15px; border-radius: 20px; margin-bottom: 15px; border-left: 5px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
@@ -32,45 +43,78 @@
         .subject-header input { background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--border); font-weight: bold; flex: 1; }
         
         .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .note-field input { width: 100%; padding: 10px 5px; border: 1px solid var(--border); border-radius: 10px; text-align: center; background: var(--bg); color: var(--text); box-sizing: border-box; }
+        .note-field input { width: 100%; padding: 12px 5px; border: 1px solid var(--border); border-radius: 10px; text-align: center; background: var(--bg); color: var(--text); box-sizing: border-box; }
 
         .btn-calc { width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 20px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin: 20px 0; }
-        .tool-btn { background: var(--card-bg); border: none; border-radius: 12px; width: 45px; height: 45px; font-size: 1.2rem; color: var(--text); cursor: pointer; }
+        .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .tool-btn { background: var(--card-bg); border: none; border-radius: 12px; width: 45px; height: 45px; font-size: 1.2rem; color: var(--text); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-        /* Bannière Installation */
-        #install-banner {
-            display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: var(--card-bg); padding: 15px;
-            border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 9999;
-            border: 2px solid var(--primary); flex-direction: column; align-items: center;
-        }
+        /* Modal & Grille de thèmes */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10001; justify-content:center; align-items:center; }
+        .modal-content { background:var(--card-bg); width:85%; max-width:350px; padding:25px; border-radius:25px; text-align:center; }
+        .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+        .color-dot { width: 40px; height: 40px; border-radius: 50%; border: 3px solid white; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        #install-banner { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: var(--card-bg); padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 9999; border: 2px solid var(--primary); flex-direction: column; align-items: center; }
     </style>
 </head>
 <body>
 
-    <div id="custom-toast">
-        <div style="font-size: 2rem;">📊</div>
-        <div id="toast-msg">Moyenne calculée</div>
-    </div>
-
     <div class="container">
-        <div style="width:100%; display:flex; justify-content:space-between; margin-bottom:15px;">
+        <div class="top-tools">
             <button class="tool-btn" onclick="share()">📤</button>
-            <button class="tool-btn" onclick="toggleDark()">🌙</button>
+            <div style="display:flex; gap:8px;">
+                <button class="tool-btn" onclick="openThemes()">🎨</button>
+                <button class="tool-btn" onclick="toggleHistory()">🕒</button>
+                <button class="tool-btn" onclick="toggleDark()">🌙</button>
+            </div>
         </div>
 
         <div class="header-card">
-            <div style="font-size: 0.9rem; font-weight: bold;">MOYENNE GÉNÉRALE</div>
+            <div style="font-size: 0.8rem; font-weight: bold;">MOYENNE GÉNÉRALE</div>
             <div id="moyenne-generale">--</div>
+            <div id="info-coef" style="font-size: 0.7rem; opacity: 0.8;">Entrez vos notes</div>
         </div>
 
         <div id="liste-matieres"></div>
-        <button class="tool-btn" style="width:100%; border-radius:15px;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
+        <button class="tool-btn" style="width:100%; border-radius:15px; font-size:0.9rem;" onclick="ajouterMatiere()">+ Matière</button>
         <button class="btn-calc" onclick="calculer()">CALCULER</button>
     </div>
 
+    <div id="modal-themes" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0">Personnaliser</h3>
+            <div class="theme-grid">
+                <div class="color-dot" style="background:#00853f" onclick="setTheme('')"></div>
+                <div class="color-dot" style="background:#2563eb" onclick="setTheme('t-blue')"></div>
+                <div class="color-dot" style="background:#dc2626" onclick="setTheme('t-red')"></div>
+                <div class="color-dot" style="background:#7c3aed" onclick="setTheme('t-purple')"></div>
+                <div class="color-dot" style="background:#f97316" onclick="setTheme('t-orange')"></div>
+                <div class="color-dot" style="background:#db2777" onclick="setTheme('t-pink')"></div>
+                <div class="color-dot" style="background:#0891b2" onclick="setTheme('t-cyan')"></div>
+                <div class="color-dot" style="background:#0d9488" onclick="setTheme('t-teal')"></div>
+                <div class="color-dot" style="background:#4f46e5" onclick="setTheme('t-indigo')"></div>
+                <div class="color-dot" style="background:#78350f" onclick="setTheme('t-brown')"></div>
+                <div class="color-dot" style="background:#475569" onclick="setTheme('t-slate')"></div>
+                <div class="color-dot" style="background:#65a30d" onclick="setTheme('t-lime')"></div>
+                <div class="color-dot" style="background:#b45309" onclick="setTheme('t-gold')"></div>
+                <div class="color-dot" style="background:#e11d48" onclick="setTheme('t-rose')"></div>
+                <div class="color-dot" style="background:#18181b" onclick="setTheme('t-black')"></div>
+            </div>
+            <button class="btn-calc" style="margin:0; padding:10px; font-size:0.9rem;" onclick="closeThemes()">OK</button>
+        </div>
+    </div>
+
+    <div id="modal-history" class="modal">
+        <div class="modal-content">
+            <h3>Historique</h3>
+            <div id="hist-list" style="max-height:200px; overflow-y:auto; margin-bottom:15px;"></div>
+            <button class="btn-calc" style="margin:0; padding:10px;" onclick="toggleHistory()">Fermer</button>
+        </div>
+    </div>
+
     <div id="install-banner">
-        <p style="margin:0 0 10px 0; font-weight:bold;">Installer l'application ? 🇸🇳</p>
+        <p style="margin-bottom:10px; font-weight:bold;">Installer l'application ?</p>
         <div style="display:flex; gap:10px; width:100%;">
             <button onclick="ignorerInstallation()" style="flex:1; padding:10px; border-radius:10px; border:none;">Plus tard</button>
             <button onclick="lancerInstallation()" style="flex:2; padding:10px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold;">Installer</button>
@@ -79,45 +123,48 @@
 
 <script>
     let matieres = JSON.parse(localStorage.getItem('saved_m')) || [{n:'Maths', c:5, d1:'', d2:'', co:''}];
+    let hist = JSON.parse(localStorage.getItem('saved_h')) || [];
     let promptInstallation;
 
-    // --- SERVICE WORKER & MISE À JOUR ---
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(reg => {
-            reg.onupdatefound = () => {
-                const worker = reg.installing;
-                worker.onstatechange = () => {
-                    if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-                        if (confirm("Mise à jour disponible ! Actualiser ?")) window.location.reload();
-                    }
-                };
-            };
-        });
+        navigator.serviceWorker.register('./sw.js');
     }
 
-    // --- LOGIQUE INSTALLATION UNIQUE ---
+    // Gestion de l'installation
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         promptInstallation = e;
-        if (!localStorage.getItem('install_invite_seen')) {
-            setTimeout(() => { document.getElementById('install-banner').style.display = 'flex'; }, 3000);
+        if (!localStorage.getItem('install_seen_v3')) {
+            setTimeout(() => { document.getElementById('install-banner').style.display = 'flex'; }, 5000);
         }
     });
 
     function lancerInstallation() {
         if (promptInstallation) {
             promptInstallation.prompt();
-            localStorage.setItem('install_invite_seen', 'true');
+            localStorage.setItem('install_seen_v3', 'true');
             document.getElementById('install-banner').style.display = 'none';
         }
     }
 
     function ignorerInstallation() {
         document.getElementById('install-banner').style.display = 'none';
-        localStorage.setItem('install_invite_seen', 'true');
+        localStorage.setItem('install_seen_v3', 'true');
     }
 
-    // --- FONCTIONS APP ---
+    // Fonctions Thèmes
+    function setTheme(t) {
+        document.body.classList.remove('t-blue','t-red','t-purple','t-orange','t-pink','t-cyan','t-teal','t-indigo','t-brown','t-slate','t-lime','t-gold','t-rose','t-violet','t-black');
+        if(t) document.body.classList.add(t);
+        localStorage.setItem('user-theme', t);
+        // Mise à jour de la couleur de la barre de statut Android
+        const color = getComputedStyle(document.body).getPropertyValue('--primary');
+        document.getElementById('meta-theme').setAttribute('content', color);
+    }
+
+    function openThemes() { document.getElementById('modal-themes').style.display = 'flex'; }
+    function closeThemes() { document.getElementById('modal-themes').style.display = 'none'; }
+
     function render() {
         const container = document.getElementById('liste-matieres');
         container.innerHTML = '';
@@ -157,27 +204,29 @@
         if(coefs > 0) {
             let res = (pts/coefs).toFixed(2);
             document.getElementById('moyenne-generale').innerText = res;
-            notif(res);
+            document.getElementById('info-coef').innerText = "Total Coefficients : " + coefs;
+            hist.unshift({s: res, d: new Date().toLocaleString()});
+            localStorage.setItem('saved_h', JSON.stringify(hist.slice(0, 10)));
         }
     }
 
-    function notif(m) {
-        if ("Notification" in window && Notification.permission === "granted") {
-            navigator.serviceWorker.ready.then(reg => {
-                reg.showNotification('Moyenne : ' + m + '/20', { icon: 'https://cdn-icons-png.flaticon.com/512/190/190411.png' });
-            });
-        }
-        const t = document.getElementById('custom-toast');
-        document.getElementById('toast-msg').innerText = "Moyenne : " + m + "/20";
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
+    function toggleHistory() {
+        const m = document.getElementById('modal-history');
+        m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        document.getElementById('hist-list').innerHTML = hist.map(h => `<div style="padding:10px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between;"><b>${h.s}</b> <small>${h.d}</small></div>`).join('') || "Vide";
     }
 
-    function toggleDark() { document.body.classList.toggle('dark-mode'); }
+    function toggleDark() { 
+        document.body.classList.toggle('dark-mode'); 
+        localStorage.setItem('dark', document.body.classList.contains('dark-mode') ? '1' : '0');
+    }
+
     function share() { if(navigator.share) navigator.share({title:'Calculateur SN', url: location.href}); }
 
+    // Initialisation
+    setTheme(localStorage.getItem('user-theme') || '');
+    if(localStorage.getItem('dark') === '1') document.body.classList.add('dark-mode');
     render();
-    Notification.requestPermission();
 </script>
 </body>
 </html>
