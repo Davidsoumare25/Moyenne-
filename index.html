@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" id="meta-theme" content="#00853f">
-    <link rel="manifest" href="manifest.json">
     <title>Calculateur Sénégal Pro</title>
     <style>
         :root {
@@ -29,30 +28,36 @@
         .container { width: 100%; max-width: 400px; padding-bottom: 80px; }
 
         .header-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        #moyenne-generale { font-size: 3rem; font-weight: 900; color: var(--yellow); margin: 5px 0; }
+        #moyenne-generale { font-size: 3.5rem; font-weight: 900; color: var(--yellow); margin: 5px 0; }
 
-        .subject-card { background: var(--card-bg); padding: 12px; border-radius: 18px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .subject-card { background: var(--card-bg); padding: 12px; border-radius: 18px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
         .subject-header { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-        .subject-header input[type="text"] { background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--border); font-weight: bold; flex: 1; padding: 4px; font-size: 0.95rem; min-width: 0; }
-        .subject-header input[type="number"] { width: 45px; border: 1px solid var(--border); border-radius: 8px; text-align: center; padding: 4px; background: var(--bg); color: var(--text); }
+        .subject-header input[type="text"] { background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--border); font-weight: bold; flex: 1; padding: 4px; font-size: 0.95rem; }
+        .subject-header input[type="number"] { width: 50px; border: 1px solid var(--border); border-radius: 8px; text-align: center; padding: 4px; background: var(--bg); color: var(--text); font-weight: bold; }
         
-        /* GRILLE OPTIMISÉE POUR NE PAS DÉBORDER */
-        .notes-grid { display: flex; justify-content: space-between; gap: 4px; }
-        .note-field { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .notes-grid { display: flex; justify-content: space-between; gap: 6px; }
+        .note-field { flex: 1; display: flex; flex-direction: column; gap: 2px; }
         .note-field label { font-size: 0.6rem; font-weight: bold; color: var(--text-light); text-align: center; }
-        .note-field input { width: 100%; padding: 8px 2px; border: 1px solid var(--border); border-radius: 8px; text-align: center; background: var(--bg); color: var(--text); font-weight: bold; font-size: 0.85rem; }
+        .note-field input { width: 100%; padding: 10px 2px; border: 1px solid var(--border); border-radius: 8px; text-align: center; background: var(--bg); color: var(--text); font-weight: bold; font-size: 0.9rem; }
 
-        .btn-calc { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1rem; font-weight: bold; cursor: pointer; margin: 10px 0; }
         .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .tool-btn { background: var(--card-bg); border: none; border-radius: 10px; width: 38px; height: 38px; font-size: 1rem; color: var(--text); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+        .tool-btn { background: var(--card-bg); border: none; border-radius: 10px; width: 40px; height: 40px; font-size: 1.1rem; color: var(--text); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
 
         .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10001; justify-content:center; align-items:center; backdrop-filter: blur(4px); }
-        .modal-content { background:var(--card-bg); width:85%; max-width:320px; padding:20px; border-radius:20px; text-align:center; }
-        .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 15px 0; }
-        .color-dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .modal-content { background:var(--card-bg); width: 85%; max-width:320px; padding:20px; border-radius:20px; text-align:center; }
+        .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; }
+        .color-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
+
+        #update-banner { display: none; position: fixed; top: 10px; width: 90%; max-width: 380px; background: var(--accent); color: white; padding: 12px; border-radius: 12px; z-index: 20000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); justify-content: space-between; align-items: center; font-weight: bold; animation: slideDown 0.5s ease; }
+        @keyframes slideDown { from { transform: translateY(-100px); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
+
+    <div id="update-banner">
+        <span>Nouvelle version !</span>
+        <button onclick="window.location.reload(true)" style="background:white; color:var(--accent); border:none; padding:8px 12px; border-radius:8px; font-weight:bold;">Mettre à jour</button>
+    </div>
 
     <div class="container">
         <div class="top-tools">
@@ -65,51 +70,62 @@
         </div>
 
         <div class="header-card">
-            <div style="font-size: 0.75rem; font-weight: bold;">MOYENNE GÉNÉRALE</div>
+            <div style="font-size: 0.8rem; font-weight: bold;">MOYENNE GÉNÉRALE</div>
             <div id="moyenne-generale">--</div>
-            <div id="info-coef" style="font-size: 0.7rem; opacity: 0.8;">Saisissez vos notes</div>
+            <div id="info-coef" style="font-size: 0.7rem; opacity: 0.8;">Modifiez vos notes pour calculer</div>
         </div>
 
         <div id="liste-matieres"></div>
         
-        <button class="tool-btn" style="width:100%; border-radius:12px; font-size:0.85rem;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
-        <button class="btn-calc" onclick="calculer()">CALCULER LA MOYENNE</button>
-
-        <div onclick="resetApp()" style="text-align:center; color:var(--accent); text-decoration:underline; font-size:0.7rem; cursor:pointer; margin-top:15px; opacity: 0.8;">Réinitialiser l'application</div>
+        <button class="tool-btn" style="width:100%; border-radius:12px; font-size:0.9rem; margin-top: 10px;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
+        <button onclick="resetApp()" style="width:100%; background:none; border:none; color:var(--accent); text-decoration:underline; font-size:0.75rem; cursor:pointer; margin-top:25px; opacity: 0.6;">Réinitialiser l'application</button>
     </div>
 
     <div id="modal-themes" class="modal" onclick="closeModal(this)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0; font-size: 1.1rem;">Thèmes</h3>
+            <h3 style="margin-top:0">15 Couleurs</h3>
             <div class="theme-grid" id="theme-grid-content"></div>
-            <button class="btn-calc" style="margin:0; padding:10px; font-size:0.9rem;" onclick="closeModal(document.getElementById('modal-themes'))">Fermer</button>
+            <button class="tool-btn" style="width:100%;" onclick="closeModal(document.getElementById('modal-themes'))">Fermer</button>
         </div>
     </div>
 
     <div id="modal-history" class="modal" onclick="closeModal(this)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0; font-size: 1.1rem;">Historique</h3>
-            <div id="hist-list" style="max-height:180px; overflow-y:auto; margin-bottom:10px; text-align:left; font-size: 0.9rem;"></div>
-            <button onclick="clearHistory()" style="color:var(--accent); border:none; background:none; text-decoration:underline; cursor:pointer; margin-bottom:10px; font-size:0.75rem;">Effacer tout</button>
-            <button class="btn-calc" style="margin:0; padding:10px; font-size:0.9rem;" onclick="closeModal(document.getElementById('modal-history'))">Fermer</button>
+            <h3 style="margin-top:0">Historique</h3>
+            <div id="hist-list" style="max-height:200px; overflow-y:auto; margin-bottom:10px; text-align:left;"></div>
+            <button onclick="clearHistory()" style="color:var(--accent); margin-bottom:15px; background:none; border:none; text-decoration:underline;">Effacer</button>
+            <button class="tool-btn" style="width:100%;" onclick="closeModal(document.getElementById('modal-history'))">Fermer</button>
         </div>
     </div>
 
 <script>
-    let matieres = JSON.parse(localStorage.getItem('saved_m')) || [{n:'Maths', c:5, d1:'', d2:'', co:''}];
-    let hist = JSON.parse(localStorage.getItem('saved_h')) || [];
+    let matieres = JSON.parse(localStorage.getItem('m_v6')) || [{n:'Maths', c:5, d1:'', d2:'', co:''}];
+    let hist = JSON.parse(localStorage.getItem('h_v6')) || [];
 
-    // --- SERVICE WORKER ---
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js');
+    // --- SYSTÈME ANTI-CACHE (VÉRIFICATION VERSION) ---
+    const APP_VERSION = "6.1"; // Change ce numéro pour forcer la mise à jour chez tout le monde
+    if (localStorage.getItem('app_v') !== APP_VERSION) {
+        localStorage.clear();
+        localStorage.setItem('app_v', APP_VERSION);
+        window.location.reload(true);
     }
 
-    // --- CALCUL FLEXIBLE ---
+    // --- SERVICE WORKER & NOTIFS ---
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+                document.getElementById('update-banner').style.display = 'flex';
+            });
+        });
+    }
+
+    // --- CALCUL AUTOMATIQUE ---
     function calculer() {
-        let ptsTotaux = 0, coefsTotaux = 0;
+        let ptsT = 0, coefT = 0;
         matieres.forEach(m => {
             let c = parseFloat(m.c) || 0;
-            let n1 = parseFloat(m.d1), n2 = parseFloat(m.d2), nc = parseFloat(m.co);
+            let n1 = Math.min(20, parseFloat(m.d1)), n2 = Math.min(20, parseFloat(m.d2)), nc = Math.min(20, parseFloat(m.co));
+            
             let notes = [];
             if(!isNaN(n1)) notes.push(n1);
             if(!isNaN(n2)) notes.push(n2);
@@ -117,48 +133,56 @@
             if ((notes.length > 0 || !isNaN(nc)) && c > 0) {
                 let moyDev = notes.length > 0 ? notes.reduce((a,b)=>a+b,0)/notes.length : null;
                 let moyMat = (moyDev !== null && !isNaN(nc)) ? (moyDev + nc) / 2 : (moyDev !== null ? moyDev : nc);
-                ptsTotaux += moyMat * c;
-                coefsTotaux += c;
+                ptsT += moyMat * c;
+                coefT += c;
             }
         });
 
-        if(coefsTotaux > 0) {
-            let res = (ptsTotaux/coefsTotaux).toFixed(2);
+        if(coefT > 0) {
+            let res = (ptsT/coefT).toFixed(2);
             document.getElementById('moyenne-generale').innerText = res;
-            document.getElementById('info-coef').innerText = "Total Coeffs : " + coefsTotaux;
-            hist.unshift({v: res, d: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})});
-            localStorage.setItem('saved_h', JSON.stringify(hist.slice(0, 10)));
-        } else { alert("Entrez au moins une note !"); }
+            document.getElementById('info-coef').innerText = "Total Coeffs : " + coefT;
+            // Sauvegarde auto
+            if(res !== "--") {
+                hist.unshift({v: res, d: new Date().toLocaleTimeString()});
+                localStorage.setItem('h_v6', JSON.stringify(hist.slice(0, 5)));
+            }
+        }
+    }
+
+    function update(i, f, v) {
+        // Bloquer au dessus de 20 pour les notes
+        if(f !== 'n' && f !== 'c' && parseFloat(v) > 20) v = 20;
+        matieres[i][f] = v;
+        localStorage.setItem('m_v6', JSON.stringify(matieres));
+        calculer(); // Calculer dès qu'on change quelque chose
     }
 
     function render() {
         const container = document.getElementById('liste-matieres');
         container.innerHTML = '';
         matieres.forEach((m, i) => {
-            const div = document.createElement('div');
-            div.className = 'subject-card';
-            div.innerHTML = `
-                <div class="subject-header">
-                    <input type="text" value="${m.n}" placeholder="Matière" oninput="update(${i},'n',this.value)">
-                    <input type="number" value="${m.c}" oninput="update(${i},'c',this.value)" placeholder="C">
-                    <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent); font-weight:bold; font-size:1.1rem; padding:0 5px;">✕</button>
-                </div>
-                <div class="notes-grid">
-                    <div class="note-field"><label>DEV 1</label><input type="number" value="${m.d1}" oninput="update(${i},'d1',this.value)"></div>
-                    <div class="note-field"><label>DEV 2</label><input type="number" value="${m.d2}" oninput="update(${i},'d2',this.value)"></div>
-                    <div class="note-field"><label>COMP</label><input type="number" value="${m.co}" oninput="update(${i},'co',this.value)"></div>
+            container.innerHTML += `
+                <div class="subject-card">
+                    <div class="subject-header">
+                        <input type="text" value="${m.n}" placeholder="Matière" oninput="update(${i},'n',this.value)">
+                        <input type="number" value="${m.c}" oninput="update(${i},'c',this.value)" placeholder="Coef">
+                        <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent); font-size:1.2rem;">✕</button>
+                    </div>
+                    <div class="notes-grid">
+                        <div class="note-field"><label>DEV 1</label><input type="number" value="${m.d1}" oninput="update(${i},'d1',this.value)" max="20"></div>
+                        <div class="note-field"><label>DEV 2</label><input type="number" value="${m.d2}" oninput="update(${i},'d2',this.value)" max="20"></div>
+                        <div class="note-field"><label>COMP</label><input type="number" value="${m.co}" oninput="update(${i},'co',this.value)" max="20"></div>
+                    </div>
                 </div>`;
-            container.appendChild(div);
         });
+        calculer();
     }
 
-    function update(i, f, v) { matieres[i][f] = v; localStorage.setItem('saved_m', JSON.stringify(matieres)); }
     function ajouterMatiere() { matieres.push({n:'', c:1, d1:'', d2:'', co:''}); render(); }
-    function remove(i) { matieres.splice(i, 1); render(); localStorage.setItem('saved_m', JSON.stringify(matieres)); }
+    function remove(i) { matieres.splice(i,1); render(); }
     function openModal(id) { 
-        if(id === 'modal-history') {
-            document.getElementById('hist-list').innerHTML = hist.map(h => `<div style="padding:6px 0; border-bottom:1px solid var(--border);"><b>${h.v}/20</b> - <small>${h.d}</small></div>`).join('') || "Vide";
-        }
+        if(id === 'modal-history') document.getElementById('hist-list').innerHTML = hist.map(h => `<div><b>${h.v}/20</b> <small>${h.d}</small></div>`).join('') || "Vide";
         document.getElementById(id).style.display = 'flex'; 
     }
     function closeModal(el) { el.style.display = 'none'; }
@@ -169,22 +193,17 @@
 
     function setTheme(t) {
         document.body.className = t + (document.body.classList.contains('dark-mode') ? ' dark-mode' : '');
-        localStorage.setItem('theme-v5', t);
-        const color = getComputedStyle(document.body).getPropertyValue('--primary').trim();
-        document.getElementById('meta-theme').setAttribute('content', color);
+        localStorage.setItem('theme_v6', t);
+        document.getElementById('meta-theme').setAttribute('content', getComputedStyle(document.body).getPropertyValue('--primary').trim());
     }
 
-    function toggleDark() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('dark-v5', document.body.classList.contains('dark-mode') ? '1' : '0');
-    }
-
-    function clearHistory() { hist=[]; localStorage.setItem('saved_h','[]'); openModal('modal-history'); }
-    function resetApp() { if(confirm("Tout supprimer ?")) { localStorage.clear(); location.reload(); } }
+    function toggleDark() { document.body.classList.toggle('dark-mode'); localStorage.setItem('dark_v6', document.body.classList.contains('dark-mode')?1:0); }
+    function clearHistory() { hist=[]; localStorage.setItem('h_v6','[]'); openModal('modal-history'); }
+    function resetApp() { if(confirm("Supprimer tout ?")) { localStorage.clear(); location.reload(); } }
     function share() { if(navigator.share) navigator.share({title:'Calculateur SN', url: location.href}); }
 
-    if(localStorage.getItem('dark-v5') === '1') document.body.classList.add('dark-mode');
-    setTheme(localStorage.getItem('theme-v5') || '');
+    if(localStorage.getItem('dark_v6')==1) document.body.classList.add('dark-mode');
+    setTheme(localStorage.getItem('theme_v6') || '');
     render();
 </script>
 </body>
