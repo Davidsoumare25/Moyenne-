@@ -4,205 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" id="meta-theme" content="#00853f">
-    <title>Calculateur Sénégal Pro</title>
+    <title>Calculateur Sénégal V8</title>
     <style>
         :root {
             --primary: #00853f; --primary-dark: #005f2d; --accent: #e31b23;
             --yellow: #fdef42; --bg: #f8fafc; --card-bg: #ffffff;
             --text: #1e293b; --text-light: #64748b; --border: #e2e8f0;
         }
-
-        /* --- THÈMES --- */
-        body.t-blue { --primary: #2563eb; } body.t-red { --primary: #dc2626; }
-        body.t-purple { --primary: #7c3aed; } body.t-orange { --primary: #f97316; }
-        body.t-pink { --primary: #db2777; } body.t-cyan { --primary: #0891b2; }
-        body.t-teal { --primary: #0d9488; } body.t-indigo { --primary: #4f46e5; }
-        body.t-brown { --primary: #78350f; } body.t-slate { --primary: #475569; }
-        body.t-lime { --primary: #65a30d; } body.t-gold { --primary: #b45309; }
-        body.t-rose { --primary: #e11d48; } body.t-violet { --primary: #8b5cf6; }
-        body.t-black { --primary: #18181b; }
-
         body.dark-mode { --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --text-light: #94a3b8; --border: #334155; }
-        
-        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 8px; display: flex; flex-direction: column; align-items: center; transition: 0.3s; overflow-x: hidden; }
+        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 8px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         .container { width: 100%; max-width: 400px; padding-bottom: 80px; }
-
-        .header-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        #moyenne-generale { font-size: 3.5rem; font-weight: 900; color: var(--yellow); margin: 5px 0; transition: 0.2s; }
-
+        .header-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; }
+        #moyenne-generale { font-size: 3.5rem; font-weight: 900; color: var(--yellow); margin: 5px 0; }
         .subject-card { background: var(--card-bg); padding: 12px; border-radius: 18px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .subject-header { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
-        .subject-header input[type="text"] { background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--border); font-weight: bold; flex: 1; padding: 4px; font-size: 0.95rem; }
-        .subject-header input[type="number"] { width: 55px; border: 1px solid var(--border); border-radius: 8px; text-align: center; padding: 6px; background: var(--bg); color: var(--text); font-weight: bold; }
-        
+        .subject-header { display: flex; gap: 8px; margin-bottom: 10px; }
+        .subject-header input[type="text"] { background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--border); flex: 1; font-weight: bold; }
+        .subject-header input[type="number"] { width: 55px; border: 1px solid var(--border); border-radius: 8px; text-align: center; font-weight: bold; padding: 5px; }
         .notes-grid { display: flex; justify-content: space-between; gap: 6px; }
-        .note-field { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-        .note-field label { font-size: 0.65rem; font-weight: bold; color: var(--text-light); text-align: center; }
-        .note-field input { width: 100%; padding: 10px 2px; border: 1px solid var(--border); border-radius: 8px; text-align: center; background: var(--bg); color: var(--text); font-weight: bold; font-size: 0.95rem; }
-
-        .btn-calc { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin: 15px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .btn-calc:active { transform: scale(0.98); }
-
-        .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .tool-btn { background: var(--card-bg); border: none; border-radius: 10px; width: 40px; height: 40px; font-size: 1.1rem; color: var(--text); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
-
-        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10001; justify-content:center; align-items:center; backdrop-filter: blur(4px); }
-        .modal-content { background:var(--card-bg); width: 85%; max-width:320px; padding:20px; border-radius:20px; text-align:center; }
-        .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; }
-        .color-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
+        .note-field { flex: 1; display: flex; flex-direction: column; text-align: center; }
+        .note-field label { font-size: 0.65rem; font-weight: bold; color: var(--text-light); }
+        .note-field input { width: 100%; padding: 10px 0; border: 1px solid var(--border); border-radius: 8px; text-align: center; font-weight: bold; background: var(--bg); color: var(--text); }
+        .btn-calc { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #update-banner { display: none; position: fixed; top: 10px; width: 90%; background: var(--accent); color: white; padding: 15px; border-radius: 12px; z-index: 10000; justify-content: space-between; align-items: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="top-tools">
-            <button class="tool-btn" onclick="share()">📤</button>
-            <div style="display:flex; gap:6px;">
-                <button class="tool-btn" onclick="openModal('modal-themes')">🎨</button>
-                <button class="tool-btn" onclick="openModal('modal-history')">🕒</button>
-                <button class="tool-btn" onclick="toggleDark()">🌙</button>
-            </div>
-        </div>
+    <div id="update-banner">
+        <span>Mise à jour disponible !</span>
+        <button onclick="forceUpdate()" style="background:white; color:var(--accent); border:none; padding:8px 12px; border-radius:8px; font-weight:bold;">Installer & Vider Cache</button>
+    </div>
 
+    <div class="container">
         <div class="header-card">
-            <div style="font-size: 0.8rem; font-weight: bold;">MOYENNE GÉNÉRALE</div>
+            <div style="font-size: 0.8rem;">MOYENNE GÉNÉRALE</div>
             <div id="moyenne-generale">--</div>
-            <div id="info-coef" style="font-size: 0.7rem; opacity: 0.8;">Tapez vos notes pour voir l'évolution</div>
+            <div id="info-coef" style="font-size: 0.75rem;">Coefficients : 0</div>
         </div>
 
         <div id="liste-matieres"></div>
         
-        <button class="tool-btn" style="width:100%; border-radius:12px; font-size:0.9rem; margin-bottom: 10px;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
-        <button class="btn-calc" onclick="calculer(true)">SAUVEGARDER MA MOYENNE</button>
-
-        <div onclick="resetApp()" style="text-align:center; color:var(--accent); text-decoration:underline; font-size:0.75rem; cursor:pointer; margin-top:30px; opacity: 0.7;">Réinitialiser toute l'application</div>
-    </div>
-
-    <div id="modal-themes" class="modal" onclick="closeModal(this)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3>Choisir Thème</h3>
-            <div class="theme-grid" id="theme-grid-content"></div>
-            <button class="btn-calc" style="margin:0" onclick="closeModal(document.getElementById('modal-themes'))">Fermer</button>
-        </div>
-    </div>
-
-    <div id="modal-history" class="modal" onclick="closeModal(this)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3>Historique</h3>
-            <div id="hist-list" style="max-height:200px; overflow-y:auto; margin-bottom:10px; text-align:left;"></div>
-            <button onclick="clearHistory()" style="color:var(--accent); background:none; border:none; text-decoration:underline; cursor:pointer;">Effacer tout</button>
-            <button class="btn-calc" style="margin:10px 0 0 0" onclick="closeModal(document.getElementById('modal-history'))">Fermer</button>
-        </div>
+        <button class="btn-calc" style="background:#64748b; font-size: 0.9rem;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
+        <button class="btn-calc" onclick="sauvegarderMoyenne()">SAUVEGARDER MA MOYENNE</button>
     </div>
 
 <script>
-    let matieres = JSON.parse(localStorage.getItem('m_v7')) || [{n:'Mathématiques', c:5, d1:'', d2:'', co:''}];
-    let hist = JSON.parse(localStorage.getItem('h_v7')) || [];
+    let matieres = JSON.parse(localStorage.getItem('m_v8')) || [{n:'Mathématiques', c:2, d1:'', d2:'', co:''}];
+    
+    // --- GESTION NOTIFICATIONS ET CACHE ---
+    async function forceUpdate() {
+        if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(key => caches.delete(key)));
+        }
+        localStorage.removeItem('app_v');
+        window.location.reload(true);
+    }
 
-    // --- MISE À JOUR AUTO ---
-    const VERSION = "7.0";
-    if(localStorage.getItem('v_app') !== VERSION) { localStorage.clear(); localStorage.setItem('v_app', VERSION); }
-
-    // --- LOGIQUE DE CALCUL ---
-    function calculer(save = false) {
-        let ptsT = 0, coefT = 0;
-        matieres.forEach(m => {
-            let c = parseFloat(m.c) || 0;
-            let n1 = parseFloat(m.d1), n2 = parseFloat(m.d2), nc = parseFloat(m.co);
-            let n_list = [];
-            if(!isNaN(n1)) n_list.push(n1);
-            if(!isNaN(n2)) n_list.push(n2);
-
-            if ((n_list.length > 0 || !isNaN(nc)) && c > 0) {
-                let mD = n_list.length > 0 ? n_list.reduce((a,b)=>a+b,0)/n_list.length : null;
-                let mM = (mD !== null && !isNaN(nc)) ? (mD + nc)/2 : (mD !== null ? mD : nc);
-                ptsT += mM * c;
-                coefT += c;
-            }
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        document.getElementById('update-banner').style.display = 'flex';
+                        envoyerNotifPush();
+                    }
+                });
+            });
         });
+    }
 
-        const display = document.getElementById('moyenne-generale');
-        if(coefT > 0) {
-            let result = (ptsT/coefT).toFixed(2);
-            display.innerText = result;
-            document.getElementById('info-coef').innerText = "Total Coefficients : " + coefT;
-            if(save) {
-                hist.unshift({v: result, d: new Date().toLocaleTimeString()});
-                localStorage.setItem('h_v7', JSON.stringify(hist.slice(0,10)));
-                alert("Moyenne de " + result + " sauvegardée dans l'historique !");
-            }
-        } else {
-            display.innerText = "--";
-            document.getElementById('info-coef').innerText = "Entrez vos notes et coeffs";
+    function envoyerNotifPush() {
+        if (Notification.permission === 'granted') {
+            new Notification("Moyenne Sénégal", { body: "Une mise à jour importante est prête !", icon: "icon.png" });
+        } else if (Notification.permission !== 'denied') {
+            Notification.requestPermission();
         }
     }
 
-    function update(i, field, value) {
-        // Bloquer les notes > 20 en temps réel dans l'input
-        if(['d1', 'd2', 'co'].includes(field)) {
-            if(parseFloat(value) > 20) {
-                value = 20;
-                // On met à jour l'affichage de l'input immédiatement
-                event.target.value = 20; 
+    // --- LOGIQUE DE CALCUL ---
+    function calculer() {
+        let ptsT = 0, coefT = 0;
+        matieres.forEach(m => {
+            let c = parseFloat(m.c) || 0;
+            let d1 = parseFloat(m.d1), d2 = parseFloat(m.d2), co = parseFloat(m.co);
+            let devoirs = [];
+            if(!isNaN(d1)) devoirs.push(Math.min(20, d1));
+            if(!isNaN(d2)) devoirs.push(Math.min(20, d2));
+
+            if ((devoirs.length > 0 || !isNaN(co)) && c > 0) {
+                let moyDev = devoirs.length > 0 ? devoirs.reduce((a,b)=>a+b,0)/devoirs.length : null;
+                let moyMat = (moyDev !== null && !isNaN(co)) ? (moyDev + co)/2 : (moyDev !== null ? moyDev : co);
+                ptsT += moyMat * c;
+                coefT += c;
             }
+        });
+        document.getElementById('moyenne-generale').innerText = coefT > 0 ? (ptsT/coefT).toFixed(2) : "--";
+        document.getElementById('info-coef').innerText = "Total Coefficients : " + coefT;
+    }
+
+    function update(i, field, value) {
+        // Limitation stricte à 20 dans l'input
+        if(['d1', 'd2', 'co'].includes(field) && parseFloat(value) > 20) {
+            value = 20;
+            event.target.value = 20;
         }
-        
         matieres[i][field] = value;
-        localStorage.setItem('m_v7', JSON.stringify(matieres));
-        calculer(); // Recalcul immédiat dès que le coef ou une note change
+        localStorage.setItem('m_v8', JSON.stringify(matieres));
+        calculer(); // Relance le calcul à chaque touche
     }
 
     function render() {
         const container = document.getElementById('liste-matieres');
-        container.innerHTML = '';
-        matieres.forEach((m, i) => {
-            container.innerHTML += `
-                <div class="subject-card">
-                    <div class="subject-header">
-                        <input type="text" value="${m.n}" placeholder="Matière" oninput="update(${i},'n',this.value)">
-                        <input type="number" value="${m.c}" oninput="update(${i},'c',this.value)" placeholder="Coef">
-                        <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent); font-size:1.2rem; cursor:pointer;">✕</button>
-                    </div>
-                    <div class="notes-grid">
-                        <div class="note-field"><label>DEV 1</label><input type="number" value="${m.d1}" oninput="update(${i},'d1',this.value)" step="0.25"></div>
-                        <div class="note-field"><label>DEV 2</label><input type="number" value="${m.d2}" oninput="update(${i},'d2',this.value)" step="0.25"></div>
-                        <div class="note-field"><label>COMP</label><input type="number" value="${m.co}" oninput="update(${i},'co',this.value)" step="0.25"></div>
-                    </div>
-                </div>`;
-        });
+        container.innerHTML = matieres.map((m, i) => `
+            <div class="subject-card">
+                <div class="subject-header">
+                    <input type="text" value="${m.n}" placeholder="Matière" oninput="update(${i},'n',this.value)">
+                    <input type="number" value="${m.c}" oninput="update(${i},'c',this.value)" placeholder="Coef">
+                    <button onclick="remove(${i})" style="border:none; background:none; color:red;">✕</button>
+                </div>
+                <div class="notes-grid">
+                    <div class="note-field"><label>DEV 1</label><input type="number" value="${m.d1}" oninput="update(${i},'d1',this.value)"></div>
+                    <div class="note-field"><label>DEV 2</label><input type="number" value="${m.d2}" oninput="update(${i},'d2',this.value)"></div>
+                    <div class="note-field"><label>COMP</label><input type="number" value="${m.co}" oninput="update(${i},'co',this.value)"></div>
+                </div>
+            </div>`).join('');
         calculer();
     }
 
-    // --- FONCTIONS SYSTÈME ---
     function ajouterMatiere() { matieres.push({n:'', c:1, d1:'', d2:'', co:''}); render(); }
     function remove(i) { matieres.splice(i,1); render(); }
-    function openModal(id) { 
-        if(id === 'modal-history') {
-            document.getElementById('hist-list').innerHTML = hist.map(h => `<div style="padding:5px 0; border-bottom:1px solid #eee;"><b>${h.v}/20</b> - <small>${h.d}</small></div>`).join('') || "Aucune sauvegarde";
-        }
-        document.getElementById(id).style.display = 'flex'; 
-    }
-    function closeModal(el) { el.style.display = 'none'; }
+    function sauvegarderMoyenne() { alert("Moyenne de " + document.getElementById('moyenne-generale').innerText + " enregistrée !"); }
 
-    const colors = ['', 't-blue', 't-red', 't-purple', 't-orange', 't-pink', 't-cyan', 't-teal', 't-indigo', 't-brown', 't-slate', 't-lime', 't-gold', 't-rose', 't-black'];
-    const hex = ['#00853f', '#2563eb', '#dc2626', '#7c3aed', '#f97316', '#db2777', '#0891b2', '#0d9488', '#4f46e5', '#78350f', '#475569', '#65a30d', '#b45309', '#e11d48', '#18181b'];
-    document.getElementById('theme-grid-content').innerHTML = colors.map((c, i) => `<div class="color-dot" style="background:${hex[i]}" onclick="setTheme('${c}')"></div>`).join('');
-
-    function setTheme(t) {
-        document.body.className = t + (document.body.classList.contains('dark-mode') ? ' dark-mode' : '');
-        localStorage.setItem('theme_v7', t);
-        const color = getComputedStyle(document.body).getPropertyValue('--primary').trim();
-        document.getElementById('meta-theme').setAttribute('content', color);
-    }
-
-    function toggleDark() { document.body.classList.toggle('dark-mode'); localStorage.setItem('dark_v7', document.body.classList.contains('dark-mode')?1:0); }
-    function clearHistory() { hist=[]; localStorage.setItem('h_v7','[]'); openModal('modal-history'); }
-    function resetApp() { if(confirm("Supprimer toutes les données ?")) { localStorage.clear(); location.reload(); } }
-    function share() { if(navigator.share) navigator.share({title:'Calculateur Sénégal', url: location.href}); }
-
-    if(localStorage.getItem('dark_v7')==1) document.body.classList.add('dark-mode');
-    setTheme(localStorage.getItem('theme_v7') || '');
     render();
+    // Demander la permission de notif au chargement
+    if (Notification.permission === 'default') Notification.requestPermission();
 </script>
 </body>
 </html>
