@@ -1,3 +1,12 @@
+self.addEventListener('install', (event) => {
+    self.skipWaiting(); // Force la mise à jour immédiate
+    // ... ton code de mise en cache habituel ...
+});
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim()); // Prend le contrôle des pages immédiatement
+});
+
 const CACHE_NAME = 'moyenne-sn-v5'; // Change le v4 à chaque grosse modif
 const ASSETS = [
   './',
