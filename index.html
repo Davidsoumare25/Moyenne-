@@ -14,51 +14,42 @@
         }
 
         /* --- THÈMES --- */
-        body.t-blue { --primary: #2563eb; --primary-dark: #1e40af; }
-        body.t-red { --primary: #dc2626; --primary-dark: #991b1b; }
-        body.t-purple { --primary: #7c3aed; --primary-dark: #5b21b6; }
-        body.t-orange { --primary: #f97316; --primary-dark: #c2410c; }
-        body.t-pink { --primary: #db2777; --primary-dark: #9d174d; }
-        body.t-cyan { --primary: #0891b2; --primary-dark: #155e75; }
-        body.t-teal { --primary: #0d9488; --primary-dark: #0f766e; }
-        body.t-indigo { --primary: #4f46e5; --primary-dark: #3730a3; }
-        body.t-brown { --primary: #78350f; --primary-dark: #451a03; }
-        body.t-slate { --primary: #475569; --primary-dark: #1e293b; }
-        body.t-lime { --primary: #65a30d; --primary-dark: #3f6212; }
-        body.t-gold { --primary: #b45309; --primary-dark: #78350f; }
-        body.t-rose { --primary: #e11d48; --primary-dark: #9f1239; }
-        body.t-violet { --primary: #8b5cf6; --primary-dark: #6d28d9; }
-        body.t-black { --primary: #18181b; --primary-dark: #000000; }
+        body.t-blue { --primary: #2563eb; } body.t-red { --primary: #dc2626; }
+        body.t-purple { --primary: #7c3aed; } body.t-orange { --primary: #f97316; }
+        body.t-pink { --primary: #db2777; } body.t-cyan { --primary: #0891b2; }
+        body.t-teal { --primary: #0d9488; } body.t-indigo { --primary: #4f46e5; }
+        body.t-brown { --primary: #78350f; } body.t-slate { --primary: #475569; }
+        body.t-lime { --primary: #65a30d; } body.t-gold { --primary: #b45309; }
+        body.t-rose { --primary: #e11d48; } body.t-violet { --primary: #8b5cf6; }
+        body.t-black { --primary: #18181b; }
 
         body.dark-mode { --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --text-light: #94a3b8; --border: #334155; }
         
-        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; transition: 0.3s; overflow-x: hidden; }
-        .container { width: 100%; max-width: 450px; padding-bottom: 100px; }
+        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 8px; display: flex; flex-direction: column; align-items: center; transition: 0.3s; overflow-x: hidden; }
+        .container { width: 100%; max-width: 400px; padding-bottom: 80px; }
 
-        .header-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 25px; border-radius: 25px; text-align: center; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        #moyenne-generale { font-size: 3.5rem; font-weight: 900; color: var(--yellow); margin: 10px 0; }
+        .header-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        #moyenne-generale { font-size: 3rem; font-weight: 900; color: var(--yellow); margin: 5px 0; }
 
-        .subject-card { background: var(--card-bg); padding: 12px; border-radius: 20px; margin-bottom: 12px; border-left: 5px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .subject-header { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
-        .subject-header input { background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--border); font-weight: bold; flex: 1; padding: 4px; font-size: 1rem; width: 60%; }
+        .subject-card { background: var(--card-bg); padding: 12px; border-radius: 18px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .subject-header { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .subject-header input[type="text"] { background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--border); font-weight: bold; flex: 1; padding: 4px; font-size: 0.95rem; min-width: 0; }
+        .subject-header input[type="number"] { width: 45px; border: 1px solid var(--border); border-radius: 8px; text-align: center; padding: 4px; background: var(--bg); color: var(--text); }
         
-        /* Correction du débordement */
-        .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .note-field { display: flex; flex-direction: column; gap: 4px; }
-        .note-field label { font-size: 0.65rem; font-weight: bold; color: var(--text-light); text-align: center; text-transform: uppercase; }
-        .note-field input { width: 100%; padding: 10px 2px; border: 1px solid var(--border); border-radius: 10px; text-align: center; background: var(--bg); color: var(--text); box-sizing: border-box; font-weight: bold; font-size: 0.9rem; }
+        /* GRILLE OPTIMISÉE POUR NE PAS DÉBORDER */
+        .notes-grid { display: flex; justify-content: space-between; gap: 4px; }
+        .note-field { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .note-field label { font-size: 0.6rem; font-weight: bold; color: var(--text-light); text-align: center; }
+        .note-field input { width: 100%; padding: 8px 2px; border: 1px solid var(--border); border-radius: 8px; text-align: center; background: var(--bg); color: var(--text); font-weight: bold; font-size: 0.85rem; }
 
-        .btn-calc { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 20px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin: 15px 0; }
-        .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .tool-btn { background: var(--card-bg); border: none; border-radius: 12px; width: 42px; height: 42px; font-size: 1.1rem; color: var(--text); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+        .btn-calc { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1rem; font-weight: bold; cursor: pointer; margin: 10px 0; }
+        .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .tool-btn { background: var(--card-bg); border: none; border-radius: 10px; width: 38px; height: 38px; font-size: 1rem; color: var(--text); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
 
         .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10001; justify-content:center; align-items:center; backdrop-filter: blur(4px); }
-        .modal-content { background:var(--card-bg); width:85%; max-width:350px; padding:20px; border-radius:25px; text-align:center; }
-        
-        .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; }
-        .color-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-
-        #install-banner { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: var(--card-bg); padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 9999; border: 2px solid var(--primary); flex-direction: column; }
+        .modal-content { background:var(--card-bg); width:85%; max-width:320px; padding:20px; border-radius:20px; text-align:center; }
+        .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 15px 0; }
+        .color-dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -66,7 +57,7 @@
     <div class="container">
         <div class="top-tools">
             <button class="tool-btn" onclick="share()">📤</button>
-            <div style="display:flex; gap:8px;">
+            <div style="display:flex; gap:6px;">
                 <button class="tool-btn" onclick="openModal('modal-themes')">🎨</button>
                 <button class="tool-btn" onclick="openModal('modal-history')">🕒</button>
                 <button class="tool-btn" onclick="toggleDark()">🌙</button>
@@ -74,22 +65,22 @@
         </div>
 
         <div class="header-card">
-            <div style="font-size: 0.8rem; font-weight: bold;">MOYENNE GÉNÉRALE</div>
+            <div style="font-size: 0.75rem; font-weight: bold;">MOYENNE GÉNÉRALE</div>
             <div id="moyenne-generale">--</div>
-            <div id="info-coef" style="font-size: 0.7rem; opacity: 0.8;">Prêt au calcul</div>
+            <div id="info-coef" style="font-size: 0.7rem; opacity: 0.8;">Saisissez vos notes</div>
         </div>
 
         <div id="liste-matieres"></div>
         
-        <button class="tool-btn" style="width:100%; border-radius:15px; font-size:0.9rem;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
+        <button class="tool-btn" style="width:100%; border-radius:12px; font-size:0.85rem;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
         <button class="btn-calc" onclick="calculer()">CALCULER LA MOYENNE</button>
 
-        <div onclick="resetApp()" style="text-align:center; color:var(--accent); text-decoration:underline; font-size:0.75rem; cursor:pointer; margin-top:20px;">Réinitialiser toute l'application</div>
+        <div onclick="resetApp()" style="text-align:center; color:var(--accent); text-decoration:underline; font-size:0.7rem; cursor:pointer; margin-top:15px; opacity: 0.8;">Réinitialiser l'application</div>
     </div>
 
     <div id="modal-themes" class="modal" onclick="closeModal(this)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0">Thèmes</h3>
+            <h3 style="margin-top:0; font-size: 1.1rem;">Thèmes</h3>
             <div class="theme-grid" id="theme-grid-content"></div>
             <button class="btn-calc" style="margin:0; padding:10px; font-size:0.9rem;" onclick="closeModal(document.getElementById('modal-themes'))">Fermer</button>
         </div>
@@ -97,90 +88,35 @@
 
     <div id="modal-history" class="modal" onclick="closeModal(this)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0">Historique</h3>
-            <div id="hist-list" style="max-height:200px; overflow-y:auto; margin-bottom:15px; text-align:left;"></div>
-            <button onclick="clearHistory()" style="color:var(--accent); border:none; background:none; text-decoration:underline; cursor:pointer; margin-bottom:15px; font-size:0.8rem;">Effacer l'historique</button>
+            <h3 style="margin-top:0; font-size: 1.1rem;">Historique</h3>
+            <div id="hist-list" style="max-height:180px; overflow-y:auto; margin-bottom:10px; text-align:left; font-size: 0.9rem;"></div>
+            <button onclick="clearHistory()" style="color:var(--accent); border:none; background:none; text-decoration:underline; cursor:pointer; margin-bottom:10px; font-size:0.75rem;">Effacer tout</button>
             <button class="btn-calc" style="margin:0; padding:10px; font-size:0.9rem;" onclick="closeModal(document.getElementById('modal-history'))">Fermer</button>
-        </div>
-    </div>
-
-    <div id="install-banner">
-        <p style="margin:0 0 12px 0; font-weight:bold; text-align:center; font-size:0.9rem;">Installer l'application sur votre écran ? 🇸🇳</p>
-        <div style="display:flex; gap:8px;">
-            <button onclick="ignorerInstallation()" style="flex:1; padding:10px; border-radius:10px; border:none; background:#eee;">Plus tard</button>
-            <button onclick="lancerInstallation()" style="flex:2; padding:10px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold;">Installer</button>
         </div>
     </div>
 
 <script>
     let matieres = JSON.parse(localStorage.getItem('saved_m')) || [{n:'Maths', c:5, d1:'', d2:'', co:''}];
     let hist = JSON.parse(localStorage.getItem('saved_h')) || [];
-    let promptInstallation;
 
-    // --- MISE À JOUR & SW ---
+    // --- SERVICE WORKER ---
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').then(reg => {
-                reg.onupdatefound = () => {
-                    const worker = reg.installing;
-                    worker.onstatechange = () => {
-                        if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-                            showUpdateUI();
-                        }
-                    };
-                };
-            });
-        });
+        navigator.serviceWorker.register('./sw.js');
     }
 
-    function showUpdateUI() {
-        const up = document.createElement('div');
-        up.style = "position:fixed; bottom:20px; background:var(--primary); color:white; padding:15px; border-radius:15px; z-index:10005; width:90%; left:50%; transform:translateX(-50%); display:flex; justify-content:space-between; align-items:center; font-weight:bold; box-shadow:0 5px 15px rgba(0,0,0,0.3);";
-        up.innerHTML = `<span>Mise à jour prête !</span> <button onclick="window.location.reload()" style="background:white; color:var(--primary); border:none; padding:8px 12px; border-radius:8px; font-weight:bold;">Actualiser</button>`;
-        document.body.appendChild(up);
-    }
-
-    // --- INSTALLATION ---
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        promptInstallation = e;
-        if (!localStorage.getItem('install_v4')) {
-            setTimeout(() => { document.getElementById('install-banner').style.display = 'flex'; }, 4000);
-        }
-    });
-
-    function lancerInstallation() {
-        if (promptInstallation) {
-            promptInstallation.prompt();
-            document.getElementById('install-banner').style.display = 'none';
-        }
-    }
-
-    function ignorerInstallation() {
-        document.getElementById('install-banner').style.display = 'none';
-        localStorage.setItem('install_v4', 'true');
-    }
-
-    // --- LOGIQUE DE CALCUL FLEXIBLE ---
+    // --- CALCUL FLEXIBLE ---
     function calculer() {
         let ptsTotaux = 0, coefsTotaux = 0;
-
         matieres.forEach(m => {
             let c = parseFloat(m.c) || 0;
             let n1 = parseFloat(m.d1), n2 = parseFloat(m.d2), nc = parseFloat(m.co);
-            
-            let devoirs = [];
-            if(!isNaN(n1)) devoirs.push(n1);
-            if(!isNaN(n2)) devoirs.push(n2);
+            let notes = [];
+            if(!isNaN(n1)) notes.push(n1);
+            if(!isNaN(n2)) notes.push(n2);
 
-            if ((devoirs.length > 0 || !isNaN(nc)) && c > 0) {
-                let moyDev = devoirs.length > 0 ? devoirs.reduce((a,b)=>a+b,0)/devoirs.length : null;
-                let moyMat = 0;
-
-                if (moyDev !== null && !isNaN(nc)) moyMat = (moyDev + nc) / 2;
-                else if (moyDev !== null) moyMat = moyDev;
-                else moyMat = nc;
-
+            if ((notes.length > 0 || !isNaN(nc)) && c > 0) {
+                let moyDev = notes.length > 0 ? notes.reduce((a,b)=>a+b,0)/notes.length : null;
+                let moyMat = (moyDev !== null && !isNaN(nc)) ? (moyDev + nc) / 2 : (moyDev !== null ? moyDev : nc);
                 ptsTotaux += moyMat * c;
                 coefsTotaux += c;
             }
@@ -189,13 +125,12 @@
         if(coefsTotaux > 0) {
             let res = (ptsTotaux/coefsTotaux).toFixed(2);
             document.getElementById('moyenne-generale').innerText = res;
-            document.getElementById('info-coef').innerText = "Total Coefficients : " + coefsTotaux;
+            document.getElementById('info-coef').innerText = "Total Coeffs : " + coefsTotaux;
             hist.unshift({v: res, d: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})});
-            localStorage.setItem('saved_h', JSON.stringify(hist.slice(0, 15)));
-        } else { alert("Veuillez entrer au moins une note et un coefficient."); }
+            localStorage.setItem('saved_h', JSON.stringify(hist.slice(0, 10)));
+        } else { alert("Entrez au moins une note !"); }
     }
 
-    // --- INTERFACE ---
     function render() {
         const container = document.getElementById('liste-matieres');
         container.innerHTML = '';
@@ -204,14 +139,14 @@
             div.className = 'subject-card';
             div.innerHTML = `
                 <div class="subject-header">
-                    <input type="text" value="${m.n}" placeholder="Matière" oninput="update(${i}, 'n', this.value)">
-                    <input type="number" value="${m.c}" oninput="update(${i}, 'c', this.value)">
-                    <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent); font-weight:bold; font-size:1.1rem;">✕</button>
+                    <input type="text" value="${m.n}" placeholder="Matière" oninput="update(${i},'n',this.value)">
+                    <input type="number" value="${m.c}" oninput="update(${i},'c',this.value)" placeholder="C">
+                    <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent); font-weight:bold; font-size:1.1rem; padding:0 5px;">✕</button>
                 </div>
                 <div class="notes-grid">
-                    <div class="note-field"><label>Dev 1</label><input type="number" value="${m.d1}" oninput="update(${i}, 'd1', this.value)"></div>
-                    <div class="note-field"><label>Dev 2</label><input type="number" value="${m.d2}" oninput="update(${i}, 'd2', this.value)"></div>
-                    <div class="note-field"><label>Comp</label><input type="number" value="${m.co}" oninput="update(${i}, 'co', this.value)"></div>
+                    <div class="note-field"><label>DEV 1</label><input type="number" value="${m.d1}" oninput="update(${i},'d1',this.value)"></div>
+                    <div class="note-field"><label>DEV 2</label><input type="number" value="${m.d2}" oninput="update(${i},'d2',this.value)"></div>
+                    <div class="note-field"><label>COMP</label><input type="number" value="${m.co}" oninput="update(${i},'co',this.value)"></div>
                 </div>`;
             container.appendChild(div);
         });
@@ -220,39 +155,36 @@
     function update(i, f, v) { matieres[i][f] = v; localStorage.setItem('saved_m', JSON.stringify(matieres)); }
     function ajouterMatiere() { matieres.push({n:'', c:1, d1:'', d2:'', co:''}); render(); }
     function remove(i) { matieres.splice(i, 1); render(); localStorage.setItem('saved_m', JSON.stringify(matieres)); }
-
-    function openModal(id) {
+    function openModal(id) { 
         if(id === 'modal-history') {
-            document.getElementById('hist-list').innerHTML = hist.map(h => `<div style="padding:8px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between;"><b>${h.v}/20</b> <small>${h.d}</small></div>`).join('') || "Aucun historique";
+            document.getElementById('hist-list').innerHTML = hist.map(h => `<div style="padding:6px 0; border-bottom:1px solid var(--border);"><b>${h.v}/20</b> - <small>${h.d}</small></div>`).join('') || "Vide";
         }
-        document.getElementById(id).style.display = 'flex';
+        document.getElementById(id).style.display = 'flex'; 
     }
     function closeModal(el) { el.style.display = 'none'; }
 
     const colors = ['', 't-blue', 't-red', 't-purple', 't-orange', 't-pink', 't-cyan', 't-teal', 't-indigo', 't-brown', 't-slate', 't-lime', 't-gold', 't-rose', 't-black'];
     const hex = ['#00853f', '#2563eb', '#dc2626', '#7c3aed', '#f97316', '#db2777', '#0891b2', '#0d9488', '#4f46e5', '#78350f', '#475569', '#65a30d', '#b45309', '#e11d48', '#18181b'];
-
     document.getElementById('theme-grid-content').innerHTML = colors.map((c, i) => `<div class="color-dot" style="background:${hex[i]}" onclick="setTheme('${c}')"></div>`).join('');
 
     function setTheme(t) {
-        document.body.classList.remove(...colors.filter(c => c !== ''));
-        if(t) document.body.classList.add(t);
-        localStorage.setItem('theme-v4', t);
+        document.body.className = t + (document.body.classList.contains('dark-mode') ? ' dark-mode' : '');
+        localStorage.setItem('theme-v5', t);
         const color = getComputedStyle(document.body).getPropertyValue('--primary').trim();
         document.getElementById('meta-theme').setAttribute('content', color);
     }
 
     function toggleDark() {
         document.body.classList.toggle('dark-mode');
-        localStorage.setItem('dark-v4', document.body.classList.contains('dark-mode') ? '1' : '0');
+        localStorage.setItem('dark-v5', document.body.classList.contains('dark-mode') ? '1' : '0');
     }
 
-    function clearHistory() { if(confirm("Effacer tout l'historique ?")) { hist=[]; localStorage.setItem('saved_h','[]'); openModal('modal-history'); } }
-    function resetApp() { if(confirm("⚠️ Supprimer TOUTES les données ?")) { localStorage.clear(); location.reload(); } }
+    function clearHistory() { hist=[]; localStorage.setItem('saved_h','[]'); openModal('modal-history'); }
+    function resetApp() { if(confirm("Tout supprimer ?")) { localStorage.clear(); location.reload(); } }
     function share() { if(navigator.share) navigator.share({title:'Calculateur SN', url: location.href}); }
 
-    if(localStorage.getItem('dark-v4') === '1') document.body.classList.add('dark-mode');
-    setTheme(localStorage.getItem('theme-v4') || '');
+    if(localStorage.getItem('dark-v5') === '1') document.body.classList.add('dark-mode');
+    setTheme(localStorage.getItem('theme-v5') || '');
     render();
 </script>
 </body>
