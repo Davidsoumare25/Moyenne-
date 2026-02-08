@@ -7,7 +7,7 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(clients.claim()); // Prend le contrôle des pages immédiatement
 });
 
-const CACHE_NAME = 'moyenne-sn-v5.1'; // Change le v4 à chaque grosse modif
+const CACHE_NAME = 'moyenne-sn-v5.3'; // Change le v4 à chaque grosse modif
 const ASSETS = [
   './',
   './index.html',
