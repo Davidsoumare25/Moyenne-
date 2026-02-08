@@ -28,17 +28,20 @@
         .container { width: 100%; max-width: 400px; padding-bottom: 80px; }
 
         .header-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        #moyenne-generale { font-size: 3.5rem; font-weight: 900; color: var(--yellow); margin: 5px 0; }
+        #moyenne-generale { font-size: 3.5rem; font-weight: 900; color: var(--yellow); margin: 5px 0; transition: 0.2s; }
 
-        .subject-card { background: var(--card-bg); padding: 12px; border-radius: 18px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
-        .subject-header { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .subject-card { background: var(--card-bg); padding: 12px; border-radius: 18px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .subject-header { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
         .subject-header input[type="text"] { background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--border); font-weight: bold; flex: 1; padding: 4px; font-size: 0.95rem; }
-        .subject-header input[type="number"] { width: 50px; border: 1px solid var(--border); border-radius: 8px; text-align: center; padding: 4px; background: var(--bg); color: var(--text); font-weight: bold; }
+        .subject-header input[type="number"] { width: 55px; border: 1px solid var(--border); border-radius: 8px; text-align: center; padding: 6px; background: var(--bg); color: var(--text); font-weight: bold; }
         
         .notes-grid { display: flex; justify-content: space-between; gap: 6px; }
         .note-field { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-        .note-field label { font-size: 0.6rem; font-weight: bold; color: var(--text-light); text-align: center; }
-        .note-field input { width: 100%; padding: 10px 2px; border: 1px solid var(--border); border-radius: 8px; text-align: center; background: var(--bg); color: var(--text); font-weight: bold; font-size: 0.9rem; }
+        .note-field label { font-size: 0.65rem; font-weight: bold; color: var(--text-light); text-align: center; }
+        .note-field input { width: 100%; padding: 10px 2px; border: 1px solid var(--border); border-radius: 8px; text-align: center; background: var(--bg); color: var(--text); font-weight: bold; font-size: 0.95rem; }
+
+        .btn-calc { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin: 15px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .btn-calc:active { transform: scale(0.98); }
 
         .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 10px; }
         .tool-btn { background: var(--card-bg); border: none; border-radius: 10px; width: 40px; height: 40px; font-size: 1.1rem; color: var(--text); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
@@ -47,17 +50,9 @@
         .modal-content { background:var(--card-bg); width: 85%; max-width:320px; padding:20px; border-radius:20px; text-align:center; }
         .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; }
         .color-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
-
-        #update-banner { display: none; position: fixed; top: 10px; width: 90%; max-width: 380px; background: var(--accent); color: white; padding: 12px; border-radius: 12px; z-index: 20000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); justify-content: space-between; align-items: center; font-weight: bold; animation: slideDown 0.5s ease; }
-        @keyframes slideDown { from { transform: translateY(-100px); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
-
-    <div id="update-banner">
-        <span>Nouvelle version !</span>
-        <button onclick="window.location.reload(true)" style="background:white; color:var(--accent); border:none; padding:8px 12px; border-radius:8px; font-weight:bold;">Mettre à jour</button>
-    </div>
 
     <div class="container">
         <div class="top-tools">
@@ -72,90 +67,89 @@
         <div class="header-card">
             <div style="font-size: 0.8rem; font-weight: bold;">MOYENNE GÉNÉRALE</div>
             <div id="moyenne-generale">--</div>
-            <div id="info-coef" style="font-size: 0.7rem; opacity: 0.8;">Modifiez vos notes pour calculer</div>
+            <div id="info-coef" style="font-size: 0.7rem; opacity: 0.8;">Tapez vos notes pour voir l'évolution</div>
         </div>
 
         <div id="liste-matieres"></div>
         
-        <button class="tool-btn" style="width:100%; border-radius:12px; font-size:0.9rem; margin-top: 10px;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
-        <button onclick="resetApp()" style="width:100%; background:none; border:none; color:var(--accent); text-decoration:underline; font-size:0.75rem; cursor:pointer; margin-top:25px; opacity: 0.6;">Réinitialiser l'application</button>
+        <button class="tool-btn" style="width:100%; border-radius:12px; font-size:0.9rem; margin-bottom: 10px;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
+        <button class="btn-calc" onclick="calculer(true)">SAUVEGARDER MA MOYENNE</button>
+
+        <div onclick="resetApp()" style="text-align:center; color:var(--accent); text-decoration:underline; font-size:0.75rem; cursor:pointer; margin-top:30px; opacity: 0.7;">Réinitialiser toute l'application</div>
     </div>
 
     <div id="modal-themes" class="modal" onclick="closeModal(this)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0">15 Couleurs</h3>
+            <h3>Choisir Thème</h3>
             <div class="theme-grid" id="theme-grid-content"></div>
-            <button class="tool-btn" style="width:100%;" onclick="closeModal(document.getElementById('modal-themes'))">Fermer</button>
+            <button class="btn-calc" style="margin:0" onclick="closeModal(document.getElementById('modal-themes'))">Fermer</button>
         </div>
     </div>
 
     <div id="modal-history" class="modal" onclick="closeModal(this)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0">Historique</h3>
+            <h3>Historique</h3>
             <div id="hist-list" style="max-height:200px; overflow-y:auto; margin-bottom:10px; text-align:left;"></div>
-            <button onclick="clearHistory()" style="color:var(--accent); margin-bottom:15px; background:none; border:none; text-decoration:underline;">Effacer</button>
-            <button class="tool-btn" style="width:100%;" onclick="closeModal(document.getElementById('modal-history'))">Fermer</button>
+            <button onclick="clearHistory()" style="color:var(--accent); background:none; border:none; text-decoration:underline; cursor:pointer;">Effacer tout</button>
+            <button class="btn-calc" style="margin:10px 0 0 0" onclick="closeModal(document.getElementById('modal-history'))">Fermer</button>
         </div>
     </div>
 
 <script>
-    let matieres = JSON.parse(localStorage.getItem('m_v6')) || [{n:'Maths', c:5, d1:'', d2:'', co:''}];
-    let hist = JSON.parse(localStorage.getItem('h_v6')) || [];
+    let matieres = JSON.parse(localStorage.getItem('m_v7')) || [{n:'Mathématiques', c:5, d1:'', d2:'', co:''}];
+    let hist = JSON.parse(localStorage.getItem('h_v7')) || [];
 
-    // --- SYSTÈME ANTI-CACHE (VÉRIFICATION VERSION) ---
-    const APP_VERSION = "6.1"; // Change ce numéro pour forcer la mise à jour chez tout le monde
-    if (localStorage.getItem('app_v') !== APP_VERSION) {
-        localStorage.clear();
-        localStorage.setItem('app_v', APP_VERSION);
-        window.location.reload(true);
-    }
+    // --- MISE À JOUR AUTO ---
+    const VERSION = "7.0";
+    if(localStorage.getItem('v_app') !== VERSION) { localStorage.clear(); localStorage.setItem('v_app', VERSION); }
 
-    // --- SERVICE WORKER & NOTIFS ---
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(reg => {
-            reg.addEventListener('updatefound', () => {
-                document.getElementById('update-banner').style.display = 'flex';
-            });
-        });
-    }
-
-    // --- CALCUL AUTOMATIQUE ---
-    function calculer() {
+    // --- LOGIQUE DE CALCUL ---
+    function calculer(save = false) {
         let ptsT = 0, coefT = 0;
         matieres.forEach(m => {
             let c = parseFloat(m.c) || 0;
-            let n1 = Math.min(20, parseFloat(m.d1)), n2 = Math.min(20, parseFloat(m.d2)), nc = Math.min(20, parseFloat(m.co));
-            
-            let notes = [];
-            if(!isNaN(n1)) notes.push(n1);
-            if(!isNaN(n2)) notes.push(n2);
+            let n1 = parseFloat(m.d1), n2 = parseFloat(m.d2), nc = parseFloat(m.co);
+            let n_list = [];
+            if(!isNaN(n1)) n_list.push(n1);
+            if(!isNaN(n2)) n_list.push(n2);
 
-            if ((notes.length > 0 || !isNaN(nc)) && c > 0) {
-                let moyDev = notes.length > 0 ? notes.reduce((a,b)=>a+b,0)/notes.length : null;
-                let moyMat = (moyDev !== null && !isNaN(nc)) ? (moyDev + nc) / 2 : (moyDev !== null ? moyDev : nc);
-                ptsT += moyMat * c;
+            if ((n_list.length > 0 || !isNaN(nc)) && c > 0) {
+                let mD = n_list.length > 0 ? n_list.reduce((a,b)=>a+b,0)/n_list.length : null;
+                let mM = (mD !== null && !isNaN(nc)) ? (mD + nc)/2 : (mD !== null ? mD : nc);
+                ptsT += mM * c;
                 coefT += c;
             }
         });
 
+        const display = document.getElementById('moyenne-generale');
         if(coefT > 0) {
-            let res = (ptsT/coefT).toFixed(2);
-            document.getElementById('moyenne-generale').innerText = res;
-            document.getElementById('info-coef').innerText = "Total Coeffs : " + coefT;
-            // Sauvegarde auto
-            if(res !== "--") {
-                hist.unshift({v: res, d: new Date().toLocaleTimeString()});
-                localStorage.setItem('h_v6', JSON.stringify(hist.slice(0, 5)));
+            let result = (ptsT/coefT).toFixed(2);
+            display.innerText = result;
+            document.getElementById('info-coef').innerText = "Total Coefficients : " + coefT;
+            if(save) {
+                hist.unshift({v: result, d: new Date().toLocaleTimeString()});
+                localStorage.setItem('h_v7', JSON.stringify(hist.slice(0,10)));
+                alert("Moyenne de " + result + " sauvegardée dans l'historique !");
             }
+        } else {
+            display.innerText = "--";
+            document.getElementById('info-coef').innerText = "Entrez vos notes et coeffs";
         }
     }
 
-    function update(i, f, v) {
-        // Bloquer au dessus de 20 pour les notes
-        if(f !== 'n' && f !== 'c' && parseFloat(v) > 20) v = 20;
-        matieres[i][f] = v;
-        localStorage.setItem('m_v6', JSON.stringify(matieres));
-        calculer(); // Calculer dès qu'on change quelque chose
+    function update(i, field, value) {
+        // Bloquer les notes > 20 en temps réel dans l'input
+        if(['d1', 'd2', 'co'].includes(field)) {
+            if(parseFloat(value) > 20) {
+                value = 20;
+                // On met à jour l'affichage de l'input immédiatement
+                event.target.value = 20; 
+            }
+        }
+        
+        matieres[i][field] = value;
+        localStorage.setItem('m_v7', JSON.stringify(matieres));
+        calculer(); // Recalcul immédiat dès que le coef ou une note change
     }
 
     function render() {
@@ -167,22 +161,25 @@
                     <div class="subject-header">
                         <input type="text" value="${m.n}" placeholder="Matière" oninput="update(${i},'n',this.value)">
                         <input type="number" value="${m.c}" oninput="update(${i},'c',this.value)" placeholder="Coef">
-                        <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent); font-size:1.2rem;">✕</button>
+                        <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent); font-size:1.2rem; cursor:pointer;">✕</button>
                     </div>
                     <div class="notes-grid">
-                        <div class="note-field"><label>DEV 1</label><input type="number" value="${m.d1}" oninput="update(${i},'d1',this.value)" max="20"></div>
-                        <div class="note-field"><label>DEV 2</label><input type="number" value="${m.d2}" oninput="update(${i},'d2',this.value)" max="20"></div>
-                        <div class="note-field"><label>COMP</label><input type="number" value="${m.co}" oninput="update(${i},'co',this.value)" max="20"></div>
+                        <div class="note-field"><label>DEV 1</label><input type="number" value="${m.d1}" oninput="update(${i},'d1',this.value)" step="0.25"></div>
+                        <div class="note-field"><label>DEV 2</label><input type="number" value="${m.d2}" oninput="update(${i},'d2',this.value)" step="0.25"></div>
+                        <div class="note-field"><label>COMP</label><input type="number" value="${m.co}" oninput="update(${i},'co',this.value)" step="0.25"></div>
                     </div>
                 </div>`;
         });
         calculer();
     }
 
+    // --- FONCTIONS SYSTÈME ---
     function ajouterMatiere() { matieres.push({n:'', c:1, d1:'', d2:'', co:''}); render(); }
     function remove(i) { matieres.splice(i,1); render(); }
     function openModal(id) { 
-        if(id === 'modal-history') document.getElementById('hist-list').innerHTML = hist.map(h => `<div><b>${h.v}/20</b> <small>${h.d}</small></div>`).join('') || "Vide";
+        if(id === 'modal-history') {
+            document.getElementById('hist-list').innerHTML = hist.map(h => `<div style="padding:5px 0; border-bottom:1px solid #eee;"><b>${h.v}/20</b> - <small>${h.d}</small></div>`).join('') || "Aucune sauvegarde";
+        }
         document.getElementById(id).style.display = 'flex'; 
     }
     function closeModal(el) { el.style.display = 'none'; }
@@ -193,17 +190,18 @@
 
     function setTheme(t) {
         document.body.className = t + (document.body.classList.contains('dark-mode') ? ' dark-mode' : '');
-        localStorage.setItem('theme_v6', t);
-        document.getElementById('meta-theme').setAttribute('content', getComputedStyle(document.body).getPropertyValue('--primary').trim());
+        localStorage.setItem('theme_v7', t);
+        const color = getComputedStyle(document.body).getPropertyValue('--primary').trim();
+        document.getElementById('meta-theme').setAttribute('content', color);
     }
 
-    function toggleDark() { document.body.classList.toggle('dark-mode'); localStorage.setItem('dark_v6', document.body.classList.contains('dark-mode')?1:0); }
-    function clearHistory() { hist=[]; localStorage.setItem('h_v6','[]'); openModal('modal-history'); }
-    function resetApp() { if(confirm("Supprimer tout ?")) { localStorage.clear(); location.reload(); } }
-    function share() { if(navigator.share) navigator.share({title:'Calculateur SN', url: location.href}); }
+    function toggleDark() { document.body.classList.toggle('dark-mode'); localStorage.setItem('dark_v7', document.body.classList.contains('dark-mode')?1:0); }
+    function clearHistory() { hist=[]; localStorage.setItem('h_v7','[]'); openModal('modal-history'); }
+    function resetApp() { if(confirm("Supprimer toutes les données ?")) { localStorage.clear(); location.reload(); } }
+    function share() { if(navigator.share) navigator.share({title:'Calculateur Sénégal', url: location.href}); }
 
-    if(localStorage.getItem('dark_v6')==1) document.body.classList.add('dark-mode');
-    setTheme(localStorage.getItem('theme_v6') || '');
+    if(localStorage.getItem('dark_v7')==1) document.body.classList.add('dark-mode');
+    setTheme(localStorage.getItem('theme_v7') || '');
     render();
 </script>
 </body>
