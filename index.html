@@ -3,298 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" id="theme-meta" content="#00853f">
-    <title>Calculateurde Moyenne</title>
+    <meta name="theme-color" content="#00853f">
+    <link rel="manifest" href="manifest.json">
+    <title>Calculateur moyenne</title>
     <style>
         :root {
-            --primary: #00853f;
-            --primary-dark: #005f2d;
-            --accent: #e31b23;
-            --yellow: #fdef42;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
+            --primary: #00853f; --primary-dark: #005f2d; --accent: #e31b23;
+            --yellow: #fdef42; --bg: #f8fafc; --card-bg: #ffffff;
+            --text: #1e293b; --text-light: #64748b; --border: #e2e8f0;
         }
+        body.dark-mode { --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --text-light: #94a3b8; --border: #334155; }
+        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; transition: 0.3s; }
+        .container { width: 100%; max-width: 450px; padding-bottom: 80px; }
 
-        /* Thèmes de couleurs */
-        body.theme-blue { --primary: #2563eb; --primary-dark: #1e40af; }
-        body.theme-orange { --primary: #f97316; --primary-dark: #c2410c; }
-        body.theme-pink { --primary: #db2777; --primary-dark: #9d174d; }
-        body.theme-purple { --primary: #7c3aed; --primary-dark: #5b21b6; }
-        body.theme-yellow { --primary: #eab308; --primary-dark: #a16207; }
-        body.theme-red { --primary: #dc2626; --primary-dark: #991b1b; }
-        body.theme-cyan { --primary: #0891b2; --primary-dark: #155e75; }
-        body.theme-dark { --primary: #334155; --primary-dark: #0f172a; }
-
-        body.dark-mode {
-            --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc;
-            --text-light: #94a3b8; --border: #334155;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg); color: var(--text);
-            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        /* Notification Interne (Toast) */
         #custom-toast {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: var(--card-bg);
-            border-radius: 15px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 9999; display: flex; align-items: center; gap: 12px;
-            border-bottom: 4px solid var(--primary); transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 90%; background: var(--card-bg); padding: 15px; border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 10000;
+            border-bottom: 4px solid var(--primary); transition: 0.5s; display: flex; align-items: center; gap: 10px;
         }
         #custom-toast.show { top: 20px; }
 
-        .container { width: 100%; max-width: 500px; padding-bottom: 60px; }
+        .header-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 25px; border-radius: 25px; text-align: center; margin-bottom: 20px; }
+        #moyenne-generale { font-size: 3.5rem; font-weight: 900; color: var(--yellow); margin: 10px 0; }
 
-        .top-tools { width: 100%; display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .tool-btn {
-            background: var(--card-bg); border: none; border-radius: 12px;
-            width: 42px; height: 42px; font-size: 1.1rem; color: var(--text);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer;
+        .subject-card { background: var(--card-bg); padding: 15px; border-radius: 20px; margin-bottom: 15px; border-left: 5px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .subject-header { display: flex; gap: 10px; margin-bottom: 12px; }
+        .subject-header input { background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--border); font-weight: bold; flex: 1; }
+        
+        .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .note-field input { width: 100%; padding: 10px 5px; border: 1px solid var(--border); border-radius: 10px; text-align: center; background: var(--bg); color: var(--text); box-sizing: border-box; }
+
+        .btn-calc { width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 20px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin: 20px 0; }
+        .tool-btn { background: var(--card-bg); border: none; border-radius: 12px; width: 45px; height: 45px; font-size: 1.2rem; color: var(--text); cursor: pointer; }
+
+        /* Bannière Installation */
+        #install-banner {
+            display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: var(--card-bg); padding: 15px;
+            border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 9999;
+            border: 2px solid var(--primary); flex-direction: column; align-items: center;
         }
-
-        .header-card {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white; padding: 20px; border-radius: 25px;
-            text-align: center; margin-bottom: 20px;
-        }
-
-        #moyenne-generale { font-size: 3rem; font-weight: 900; margin: 5px 0; color: var(--yellow); }
-
-        .subject-card {
-            background: var(--card-bg); padding: 12px; border-radius: 20px;
-            margin-bottom: 12px; border-left: 5px solid var(--primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .subject-header { display: flex; gap: 8px; margin-bottom: 10px; }
-        .subject-header input { 
-            background: transparent; color: var(--text); border: none; 
-            border-bottom: 2px solid var(--border); font-weight: bold; width: 100%;
-        }
-
-        .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .note-field { display: flex; flex-direction: column; }
-        .note-field label { font-size: 0.6rem; color: var(--text-light); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
-        .note-field input { 
-            width: 100%; padding: 10px 5px; border: 1px solid var(--border); 
-            border-radius: 8px; text-align: center; font-weight: bold;
-            background: var(--bg); color: var(--text); box-sizing: border-box;
-        }
-
-        .btn-calc {
-            width: 100%; padding: 18px; background: var(--primary);
-            color: white; border: none; border-radius: 18px;
-            font-size: 1.1rem; font-weight: bold; margin: 15px 0; cursor: pointer;
-        }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); width: 85%; max-width: 350px; padding: 25px; border-radius: 25px; color: var(--text); }
-        .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 15px 0; }
-        .theme-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-
-        .signature { text-align: center; font-size: 0.8rem; color: var(--text-light); margin-top: 20px; }
     </style>
 </head>
-<body id="app-body">
+<body>
 
     <div id="custom-toast">
-        <div id="toast-icon" style="font-size: 1.5rem;">🎓</div>
-        <div>
-            <div id="toast-title" style="font-weight: bold; font-size: 0.9rem;">Résultat calculé !</div>
-            <div id="toast-body" style="font-size: 0.8rem; color: var(--text-light);">--</div>
+        <div style="font-size: 2rem;">📊</div>
+        <div id="toast-msg">Moyenne calculée</div>
+    </div>
+
+    <div class="container">
+        <div style="width:100%; display:flex; justify-content:space-between; margin-bottom:15px;">
+            <button class="tool-btn" onclick="share()">📤</button>
+            <button class="tool-btn" onclick="toggleDark()">🌙</button>
+        </div>
+
+        <div class="header-card">
+            <div style="font-size: 0.9rem; font-weight: bold;">MOYENNE GÉNÉRALE</div>
+            <div id="moyenne-generale">--</div>
+        </div>
+
+        <div id="liste-matieres"></div>
+        <button class="tool-btn" style="width:100%; border-radius:15px;" onclick="ajouterMatiere()">+ Ajouter une matière</button>
+        <button class="btn-calc" onclick="calculer()">CALCULER</button>
+    </div>
+
+    <div id="install-banner">
+        <p style="margin:0 0 10px 0; font-weight:bold;">Installer l'application ? 🇸🇳</p>
+        <div style="display:flex; gap:10px; width:100%;">
+            <button onclick="ignorerInstallation()" style="flex:1; padding:10px; border-radius:10px; border:none;">Plus tard</button>
+            <button onclick="lancerInstallation()" style="flex:2; padding:10px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold;">Installer</button>
         </div>
     </div>
-
-<div class="container">
-    <div class="top-tools">
-        <button class="tool-btn" onclick="shareApp()">🔁</button>
-        <div>
-            <button class="tool-btn" onclick="toggleDarkMode()">🌙</button>
-            <button class="tool-btn" onclick="openSettings()">🎨</button>
-            <button class="tool-btn" onclick="toggleHistory()">🕒</button>
-        </div>
-    </div>
-
-    <div class="header-card">
-        <span style="font-size: 0.8rem; letter-spacing: 1px;">MOYENNE GÉNÉRALE</span>
-        <div id="moyenne-generale">--</div>
-        <div id="info-coef" style="font-size: 0.8rem; opacity: 0.8;">Ajoutez vos notes</div>
-    </div>
-
-    <div id="liste-matieres"></div>
-
-    <button class="tool-btn" style="width:100%; border-radius:15px; font-size: 0.85rem;" onclick="ajouterLigne()">+ Ajouter une matière</button>
-    <button class="btn-calc" onclick="calculerMoyenne()">CALCULER LA MOYENNE</button>
-    <button onclick="reinitialiserTout()" style="background:none; border:none; color:var(--accent); text-decoration:underline; font-size:0.8rem; cursor:pointer; width:100%;">Réinitialiser toutes les notes</button>
-
-    <div class="signature">@Daouda Soumaré</div>
-</div>
-
-<div id="history-modal" class="modal">
-    <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <h3>Historique</h3>
-            <button onclick="toggleHistory()" style="border:none; background:none; font-size:1.5rem; color:var(--text);">✕</button>
-        </div>
-        <div id="history-list" style="max-height: 250px; overflow-y: auto;"></div>
-        <button onclick="clearHistory()" style="width:100%; margin-top:20px; color:var(--accent); border:1px solid var(--accent); background:none; padding:10px; border-radius:10px; font-size:0.8rem; cursor:pointer;">🗑️ Vider</button>
-    </div>
-</div>
-
-<div id="settings-modal" class="modal">
-    <div class="modal-content">
-        <h3 style="text-align:center;">Thèmes</h3>
-        <div class="theme-selector">
-            <div class="theme-dot" style="background: #00853f;" onclick="setTheme('green')"></div>
-            <div class="theme-dot" style="background: #2563eb;" onclick="setTheme('blue')"></div>
-            <div class="theme-dot" style="background: #f97316;" onclick="setTheme('orange')"></div>
-            <div class="theme-dot" style="background: #db2777;" onclick="setTheme('pink')"></div>
-            <div class="theme-dot" style="background: #7c3aed;" onclick="setTheme('purple')"></div>
-            <div class="theme-dot" style="background: #eab308;" onclick="setTheme('yellow')"></div>
-            <div class="theme-dot" style="background: #dc2626;" onclick="setTheme('red')"></div>
-            <div class="theme-dot" style="background: #0891b2;" onclick="setTheme('cyan')"></div>
-            <div class="theme-dot" style="background: #334155;" onclick="setTheme('dark')"></div>
-        </div>
-        <button onclick="closeSettings()" class="btn-calc" style="padding: 10px;">Fermer</button>
-    </div>
-</div>
 
 <script>
- let matieres = JSON.parse(localStorage.getItem('saved_m')) || [{n:'Maths', c:5, d1:'', d2:'', co:''}];
-let hist = JSON.parse(localStorage.getItem('saved_h')) || [];
+    let matieres = JSON.parse(localStorage.getItem('saved_m')) || [{n:'Maths', c:5, d1:'', d2:'', co:''}];
+    let promptInstallation;
 
-// --- LOGIQUE SERVICE WORKER & MISE À JOUR ---
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
+    // --- SERVICE WORKER & MISE À JOUR ---
+    if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').then(reg => {
-            // Détecter une mise à jour du code
             reg.onupdatefound = () => {
-                const installingWorker = reg.installing;
-                installingWorker.onstatechange = () => {
-                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // Une nouvelle version est disponible !
-                        if (confirm("Une mise à jour est disponible ! Voulez-vous l'installer pour profiter des nouveautés ?")) {
-                            window.location.reload();
-                        }
+                const worker = reg.installing;
+                worker.onstatechange = () => {
+                    if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                        if (confirm("Mise à jour disponible ! Actualiser ?")) window.location.reload();
                     }
                 };
             };
         });
-    });
-}
+    }
 
-// --- LOGIQUE INSTALLATION (BANDEAU) ---
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Empêche Chrome d'afficher la petite barre grise par défaut
-    e.preventDefault();
-    deferredPrompt = e;
-    // On affiche notre propre notification d'installation après 3 secondes
-    setTimeout(() => {
-        if (confirm("Voulez-vous installer 'Calculateur Sénégal' sur votre écran d'accueil pour l'utiliser hors-ligne ?")) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('Utilisateur a installé l\'app');
-                }
-                deferredPrompt = null;
-            });
-        }
-    }, 3000);
-});
-
-// --- RESTE DE TES FONCTIONS (Calcul, Render, etc.) ---
-function init() {
-    if(localStorage.getItem('dark') === '1') document.body.classList.add('dark-mode');
-    setTheme(localStorage.getItem('theme') || 'green');
-    render();
-}
-
-function render() {
-    const container = document.getElementById('liste-matieres');
-    container.innerHTML = '';
-    matieres.forEach((m, i) => {
-        const div = document.createElement('div');
-        div.className = 'subject-card';
-        div.innerHTML = `
-            <div class="subject-header">
-                <input type="text" value="${m.n}" placeholder="Matière" oninput="update(${i}, 'n', this.value)">
-                <input type="number" value="${m.c}" style="width:40px" oninput="update(${i}, 'c', this.value)">
-                <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent); font-weight:bold; cursor:pointer;">✕</button>
-            </div>
-            <div class="notes-grid">
-                <div class="note-field"><label>DEVOIR 1</label><input type="number" step="0.01" value="${m.d1}" oninput="update(${i}, 'd1', this.value)"></div>
-                <div class="note-field"><label>DEVOIR 2</label><input type="number" step="0.01" value="${m.d2}" oninput="update(${i}, 'd2', this.value)"></div>
-                <div class="note-field"><label>COMPO</label><input type="number" step="0.01" value="${m.co}" oninput="update(${i}, 'co', this.value)"></div>
-            </div>`;
-        container.appendChild(div);
-    });
-}
-
-function update(i, field, val) { matieres[i][field] = val; localStorage.setItem('saved_m', JSON.stringify(matieres)); }
-function ajouterMatiere() { matieres.push({n:'', c:1, d1:'', d2:'', co:''}); render(); }
-function remove(i) { matieres.splice(i, 1); render(); localStorage.setItem('saved_m', JSON.stringify(matieres)); }
-
-function calculer() {
-    let pts = 0, coefs = 0;
-    matieres.forEach(m => {
-        let c = parseFloat(m.c) || 0;
-        let n1 = parseFloat(m.d1), n2 = parseFloat(m.d2), nc = parseFloat(m.co);
-        if(!isNaN(n1) && !isNaN(n2) && !isNaN(nc) && c > 0) {
-            pts += (((n1+n2)/2 + nc)/2) * c;
-            coefs += c;
+    // --- LOGIQUE INSTALLATION UNIQUE ---
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        promptInstallation = e;
+        if (!localStorage.getItem('install_invite_seen')) {
+            setTimeout(() => { document.getElementById('install-banner').style.display = 'flex'; }, 3000);
         }
     });
 
-    if(coefs > 0) {
-        let res = (pts/coefs).toFixed(2);
-        document.getElementById('moyenne-generale').innerText = res;
-        notif(res);
-        hist.unshift({s: res, d: new Date().toLocaleDateString()});
-        localStorage.setItem('saved_h', JSON.stringify(hist.slice(0, 10)));
-    } else { alert("Remplissez au moins une ligne !"); }
-}
+    function lancerInstallation() {
+        if (promptInstallation) {
+            promptInstallation.prompt();
+            localStorage.setItem('install_invite_seen', 'true');
+            document.getElementById('install-banner').style.display = 'none';
+        }
+    }
 
-function notif(m) {
-    if ("Notification" in window && Notification.permission === "granted") {
-        navigator.serviceWorker.ready.then(reg => {
-            reg.showNotification('Moyenne : ' + m + '/20', { 
-                body: 'Ton résultat est enregistré.', 
-                icon: 'https://cdn-icons-png.flaticon.com/512/190/190411.png' 
-            });
+    function ignorerInstallation() {
+        document.getElementById('install-banner').style.display = 'none';
+        localStorage.setItem('install_invite_seen', 'true');
+    }
+
+    // --- FONCTIONS APP ---
+    function render() {
+        const container = document.getElementById('liste-matieres');
+        container.innerHTML = '';
+        matieres.forEach((m, i) => {
+            const div = document.createElement('div');
+            div.className = 'subject-card';
+            div.innerHTML = `
+                <div class="subject-header">
+                    <input type="text" value="${m.n}" oninput="update(${i}, 'n', this.value)">
+                    <input type="number" value="${m.c}" style="width:40px" oninput="update(${i}, 'c', this.value)">
+                    <button onclick="remove(${i})" style="border:none; background:none; color:var(--accent);">✕</button>
+                </div>
+                <div class="notes-grid">
+                    <div class="note-field"><input type="number" placeholder="D1" value="${m.d1}" oninput="update(${i}, 'd1', this.value)"></div>
+                    <div class="note-field"><input type="number" placeholder="D2" value="${m.d2}" oninput="update(${i}, 'd2', this.value)"></div>
+                    <div class="note-field"><input type="number" placeholder="Comp" value="${m.co}" oninput="update(${i}, 'co', this.value)"></div>
+                </div>`;
+            container.appendChild(div);
         });
     }
-    const t = document.getElementById('custom-toast');
-    document.getElementById('toast-msg').innerText = "Moyenne : " + m + "/20";
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
-}
 
-function setTheme(t) {
-    document.body.classList.remove('theme-blue','theme-orange','theme-pink','theme-purple','theme-red','theme-cyan');
-    if(t !== 'green') document.body.classList.add('theme-'+t);
-    localStorage.setItem('theme', t);
-}
+    function update(i, f, v) { matieres[i][f] = v; localStorage.setItem('saved_m', JSON.stringify(matieres)); }
+    function ajouterMatiere() { matieres.push({n:'', c:1, d1:'', d2:'', co:''}); render(); }
+    function remove(i) { matieres.splice(i, 1); render(); updateStorage(); }
+    function updateStorage() { localStorage.setItem('saved_m', JSON.stringify(matieres)); }
 
-function toggleDark() { 
-    document.body.classList.toggle('dark-mode'); 
-    localStorage.setItem('dark', document.body.classList.contains('dark-mode') ? '1' : '0'); 
-}
+    function calculer() {
+        let pts = 0, coefs = 0;
+        matieres.forEach(m => {
+            let c = parseFloat(m.c) || 0;
+            let n1 = parseFloat(m.d1), n2 = parseFloat(m.d2), nc = parseFloat(m.co);
+            if(!isNaN(n1) && !isNaN(n2) && !isNaN(nc) && c > 0) {
+                pts += (((n1+n2)/2 + nc)/2) * c;
+                coefs += c;
+            }
+        });
+        if(coefs > 0) {
+            let res = (pts/coefs).toFixed(2);
+            document.getElementById('moyenne-generale').innerText = res;
+            notif(res);
+        }
+    }
 
-function openThemes() { document.getElementById('modal-themes').style.display = 'flex'; }
-function closeThemes() { document.getElementById('modal-themes').style.display = 'none'; }
-function toggleHistory() {
-    const m = document.getElementById('modal-history');
-    m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-    document.getElementById('hist-list').innerHTML = hist.map(h => `<div style="padding:10px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between;"><b>${h.s}</b> <span>${h.d}</span></div>`).join('') || "Aucun historique";
-}
+    function notif(m) {
+        if ("Notification" in window && Notification.permission === "granted") {
+            navigator.serviceWorker.ready.then(reg => {
+                reg.showNotification('Moyenne : ' + m + '/20', { icon: 'https://cdn-icons-png.flaticon.com/512/190/190411.png' });
+            });
+        }
+        const t = document.getElementById('custom-toast');
+        document.getElementById('toast-msg').innerText = "Moyenne : " + m + "/20";
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
 
-init();
-Notification.requestPermission();
+    function toggleDark() { document.body.classList.toggle('dark-mode'); }
+    function share() { if(navigator.share) navigator.share({title:'Calculateur SN', url: location.href}); }
+
+    render();
+    Notification.requestPermission();
+</script>
+</body>
+</html>
+
