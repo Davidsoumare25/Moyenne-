@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sénégal Scolaire OS - Simplifié</title>
+    <title>Sénégal Scolaire OS</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Ma Moyenne">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3145/3145196.png">
+    <link rel="apple-touch-icon" href="icon.png">
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
         :root {
             --sn-green: #00853f; --sn-yellow: #fdef42; --sn-red: #e31b23;
             --dock-bg: rgba(255, 255, 255, 0.4); --card-bg: rgba(255, 255, 255, 0.95); --text-color: #000;
@@ -163,8 +165,7 @@ function getMoyenneSemestre(sem) {
         const d2 = parseFloat(card.querySelector('.val-d2').value) || 0;
         const comp = parseFloat(card.querySelector('.val-comp').value) || 0;
         const coef = parseFloat(card.querySelector('.val-coef').value) || 1;
-
-        const moyenneMatiere = (d1 + d2 + comp)/3; // moyenne simple des notes
+        const moyenneMatiere = (d1 + d2 + comp)/3;
         total += moyenneMatiere * coef;
         sommeCoef += coef;
     });
@@ -174,7 +175,6 @@ function getMoyenneSemestre(sem) {
 function calculerSeul() {
     const moy = getMoyenneSemestre(currentSem);
     document.getElementById('score-display').innerText = moy.toFixed(2);
-    
     const disp = document.getElementById('mention-display');
     if(moy >= 16) disp.innerText = "🌟 Félicitations !";
     else if(moy >= 14) disp.innerText = "👏 Très Bien";
@@ -213,7 +213,6 @@ window.onload = () => {
     switchSemester(1); 
 };
 
-// ENREGISTREMENT DU SERVICE WORKER (AJOUTÉ POUR L'INSTALLATION)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(err => console.log('Erreur SW:', err));
