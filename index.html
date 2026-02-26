@@ -39,6 +39,10 @@
         .coef-box input { width: 30px; border: none; background: none; text-align: center; font-weight: 900; }
         .notes-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .note-field input { width: 100%; padding: 10px; border-radius: 12px; border: 1.5px solid #cbd5e1; text-align: center; font-weight: 800; box-sizing: border-box; }
+        
+        /* Style pour la zone publicitaire */
+        .ad-banner { text-align: center; margin: 15px 0; min-height: 50px; }
+
         .iphone-dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 92%; max-width: 420px; background: var(--dock-bg); backdrop-filter: blur(25px);
@@ -54,7 +58,6 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 2000; overflow-y: auto; color: var(--text-color);
         }
         .hidden { display: none; }
-        .graph-container { display: none; height: 120px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -69,6 +72,17 @@
         <h1 id="score-display">0.00</h1>
         <div class="mention-text" id="mention-display"></div>
         <div style="font-size:0.8rem; opacity:0.8; margin-top:5px;">Moyenne Annuelle: <span id="moy-annuelle">--</span></div>
+    </div>
+
+    <div class="ad-banner">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:320px;height:50px"
+             data-ad-client="ca-pub-2847151888169934"
+             data-ad-slot="7751303675"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
     </div>
 
     <div id="container-s1"></div>
@@ -98,7 +112,6 @@
 
 <script>
 let currentSem = 1;
-let charts = {};
 
 function switchSemester(sem) {
     currentSem = sem;
@@ -119,7 +132,6 @@ function ajouterMatiere(nom="", coef=1, d1="", d2="", comp="") {
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <input type="text" class="matiere-name" value="${nom}" placeholder="MATIÈRE">
             <div style="display:flex; gap:8px; align-items:center;">
-                <button style="border:none; background:none; cursor:pointer;" onclick="toggleGraph('${id}')">📈</button>
                 <div class="coef-box">COEF: <input type="number" class="val-coef" value="${coef}" min="1" oninput="calculerSeul()"></div>
                 <span style="color:red; cursor:pointer; font-weight:bold; font-size:1.2rem;" onclick="this.closest('.matiere-card').remove(); calculerSeul();">×</span>
             </div>
@@ -128,33 +140,12 @@ function ajouterMatiere(nom="", coef=1, d1="", d2="", comp="") {
             <div class="note-field"><input type="number" class="val-d1" value="${d1}" placeholder="D1" min="0" max="20" oninput="calculerSeul()"></div>
             <div class="note-field"><input type="number" class="val-d2" value="${d2}" placeholder="D2" min="0" max="20" oninput="calculerSeul()"></div>
             <div class="note-field"><input type="number" class="val-comp" value="${comp}" placeholder="Comp" min="0" max="20" oninput="calculerSeul()"></div>
-        </div>
-        <div class="graph-container" id="graph-area-${id}"><canvas id="chart-${id}"></canvas></div>`;
+        </div>`;
     container.appendChild(div);
     calculerSeul();
 }
 
-function toggleGraph(id) {
-    const area = document.getElementById(`graph-area-${id}`);
-    area.style.display = (area.style.display === 'block') ? 'none' : 'block';
-    if(area.style.display === 'block') initChart(id);
-}
-
-function initChart(id) {
-    const ctx = document.getElementById(`chart-${id}`).getContext('2d');
-    if (charts[id]) charts[id].destroy();
-    const card = document.getElementById(`card-${id}`);
-    const d1 = parseFloat(card.querySelector('.val-d1').value)||0;
-    const d2 = parseFloat(card.querySelector('.val-d2').value)||0;
-    const comp = parseFloat(card.querySelector('.val-comp').value)||0;
-    charts[id] = new Chart(ctx, {
-        type: 'line',
-        data: { labels: ['D1', 'D2', 'Comp'], datasets: [{ data: [d1, d2, comp], borderColor: '#00853f', tension: 0.4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 20 } } }
-    });
-}
-
-// NOUVELLE MÉTHODE DE CALCUL SÉNÉGALAISE
+// MÉTHODE DE CALCUL : (Somme des devoirs / 2 + Composition) / 2
 function getMoyenneSemestre(sem) {
     const cards = document.querySelectorAll(`#container-s${sem} .matiere-card`);
     let cumulPointsCoeff = 0;
@@ -166,13 +157,9 @@ function getMoyenneSemestre(sem) {
         const comp = parseFloat(card.querySelector('.val-comp').value) || 0;
         const coef = parseFloat(card.querySelector('.val-coef').value) || 1;
 
-        // Étape 1 : Somme des devoirs ÷ 2 = moyenneDevoirs
         const moyenneDevoirs = (d1 + d2) / 2;
-        
-        // Étape 2 : moyenneDevoirs + composition ÷ 2 = totalPoints (moyenne de la matière)
         const moyenneMatiere = (moyenneDevoirs + comp) / 2;
 
-        // Cumul pour la moyenne du semestre
         cumulPointsCoeff += (moyenneMatiere * coef);
         totalCoefs += coef;
     });
@@ -195,7 +182,6 @@ function calculerSeul() {
     const s1 = getMoyenneSemestre(1);
     const s2 = getMoyenneSemestre(2);
     
-    // Moyenne annuelle si les deux semestres ont des notes
     if(s1 > 0 && s2 > 0) {
         document.getElementById('moy-annuelle').innerText = ((s1 + s2) / 2).toFixed(2);
     } else {
@@ -211,24 +197,20 @@ function sauvegarderHist() {
     let h = JSON.parse(localStorage.getItem('sn_hist_clean') || "[]");
     h.unshift({ date: new Date().toLocaleString(), moy: moy });
     localStorage.setItem('sn_hist_clean', JSON.stringify(h.slice(0,10)));
-    alert("Sauvegardé !");
+    alert("Moyenne sauvegardée dans l'historique !");
 }
 
 function toggleHistory() {
     const h = JSON.parse(localStorage.getItem('sn_hist_clean') || "[]");
-    document.getElementById('history-list').innerHTML = h.map(i => `<div style="padding:10px; border-bottom:1px solid #eee"><b>${i.moy}</b> <small style="float:right">${i.date}</small></div>`).join('') || "Vide";
+    document.getElementById('history-list').innerHTML = h.map(i => `<div style="padding:10px; border-bottom:1px solid #eee"><b>${i.moy}</b> <small style="float:right">${i.date}</small></div>`).join('') || "Aucun historique.";
     document.getElementById('popup-history').style.display = 'block';
 }
 
 window.onload = () => { 
     switchSemester(1); 
     ajouterMatiere("Français", 2); 
-    switchSemester(2); 
-    ajouterMatiere("Maths", 3); 
-    switchSemester(1); 
 };
 
-// Enregistrement Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(err => console.log('Erreur SW:', err));
