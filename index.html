@@ -40,18 +40,18 @@
         .notes-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .note-field input { width: 100%; padding: 10px; border-radius: 12px; border: 1.5px solid #cbd5e1; text-align: center; font-weight: 800; box-sizing: border-box; }
         
-        /* Style pour la zone publicitaire */
+        /* Bannière Publicitaire */
         .ad-banner { text-align: center; margin: 15px 0; min-height: 50px; }
 
         .iphone-dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 92%; max-width: 420px; background: var(--dock-bg); backdrop-filter: blur(25px);
-            border-radius: 40px; padding: 15px; display: flex; justify-content: space-around;
+            width: 95%; max-width: 440px; background: var(--dock-bg); backdrop-filter: blur(25px);
+            border-radius: 40px; padding: 12px; display: flex; justify-content: space-around;
             box-shadow: 0 15px 35px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.2);
         }
-        .dock-app { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; border: none; background: none; }
-        .app-icon { width: 55px; height: 55px; border-radius: 14px; background: white; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .app-label { color: white; font-size: 0.7rem; font-weight: bold; }
+        .dock-app { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; border: none; background: none; text-decoration: none; }
+        .app-icon { width: 50px; height: 50px; border-radius: 12px; background: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .app-label { color: white; font-size: 0.65rem; font-weight: bold; }
         .ios-popup {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 85%; max-height: 75vh; background: var(--card-bg); border-radius: 30px; padding: 25px; 
@@ -71,7 +71,7 @@
     <div class="header-score">
         <h1 id="score-display">0.00</h1>
         <div class="mention-text" id="mention-display"></div>
-        <div style="font-size:0.8rem; opacity:0.8; margin-top:5px;">Moyenne Annuelle: <span id="moy-annuelle">--</span></div>
+        <div style="font-size:0.8rem; opacity:0.9; margin-top:5px;">Moyenne Annuelle: <span id="moy-annuelle">--</span></div>
     </div>
 
     <div class="ad-banner">
@@ -105,6 +105,9 @@
     <button class="dock-app" onclick="toggleHistory()">
         <div class="app-icon" style="background: #007aff; color:white;">📜</div><span class="app-label">Hist.</span>
     </button>
+    <a href="soutien.html" class="dock-app">
+        <div class="app-icon" style="background: #ffcc00; color:black;">❤️</div><span class="app-label">Soutenir</span>
+    </a>
     <button class="dock-app" onclick="toggleDarkMode()">
         <div class="app-icon" style="background: #5856d6; color:white;">🌙</div><span class="app-label">Mode</span>
     </button>
@@ -130,25 +133,25 @@ function ajouterMatiere(nom="", coef=1, d1="", d2="", comp="") {
     div.id = `card-${id}`;
     div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <input type="text" class="matiere-name" value="${nom}" placeholder="MATIÈRE">
+            <input type="text" class="matiere-name" value="${nom}" placeholder="NOM">
             <div style="display:flex; gap:8px; align-items:center;">
                 <div class="coef-box">COEF: <input type="number" class="val-coef" value="${coef}" min="1" oninput="calculerSeul()"></div>
                 <span style="color:red; cursor:pointer; font-weight:bold; font-size:1.2rem;" onclick="this.closest('.matiere-card').remove(); calculerSeul();">×</span>
             </div>
         </div>
         <div class="notes-grid">
-            <div class="note-field"><input type="number" class="val-d1" value="${d1}" placeholder="D1" min="0" max="20" oninput="calculerSeul()"></div>
-            <div class="note-field"><input type="number" class="val-d2" value="${d2}" placeholder="D2" min="0" max="20" oninput="calculerSeul()"></div>
-            <div class="note-field"><input type="number" class="val-comp" value="${comp}" placeholder="Comp" min="0" max="20" oninput="calculerSeul()"></div>
+            <div class="note-field"><input type="number" class="val-d1" value="${d1}" placeholder="D1" oninput="calculerSeul()"></div>
+            <div class="note-field"><input type="number" class="val-d2" value="${d2}" placeholder="D2" oninput="calculerSeul()"></div>
+            <div class="note-field"><input type="number" class="val-comp" value="${comp}" placeholder="Comp" oninput="calculerSeul()"></div>
         </div>`;
     container.appendChild(div);
     calculerSeul();
 }
 
-// MÉTHODE DE CALCUL : (Somme des devoirs / 2 + Composition) / 2
+// LOGIQUE SÉNÉGALAISE : ((D1+D2)/2 + COMP) / 2
 function getMoyenneSemestre(sem) {
     const cards = document.querySelectorAll(`#container-s${sem} .matiere-card`);
-    let cumulPointsCoeff = 0;
+    let cumulPoints = 0;
     let totalCoefs = 0;
 
     cards.forEach(card => {
@@ -157,14 +160,14 @@ function getMoyenneSemestre(sem) {
         const comp = parseFloat(card.querySelector('.val-comp').value) || 0;
         const coef = parseFloat(card.querySelector('.val-coef').value) || 1;
 
-        const moyenneDevoirs = (d1 + d2) / 2;
-        const moyenneMatiere = (moyenneDevoirs + comp) / 2;
+        const moyDevoirs = (d1 + d2) / 2;
+        const moyMatiere = (moyDevoirs + comp) / 2;
 
-        cumulPointsCoeff += (moyenneMatiere * coef);
+        cumulPoints += (moyMatiere * coef);
         totalCoefs += coef;
     });
 
-    return totalCoefs > 0 ? (cumulPointsCoeff / totalCoefs) : 0;
+    return totalCoefs > 0 ? (cumulPoints / totalCoefs) : 0;
 }
 
 function calculerSeul() {
@@ -181,7 +184,6 @@ function calculerSeul() {
 
     const s1 = getMoyenneSemestre(1);
     const s2 = getMoyenneSemestre(2);
-    
     if(s1 > 0 && s2 > 0) {
         document.getElementById('moy-annuelle').innerText = ((s1 + s2) / 2).toFixed(2);
     } else {
@@ -194,26 +196,23 @@ function closePopups() { document.querySelectorAll('.ios-popup').forEach(p => p.
 
 function sauvegarderHist() {
     const moy = document.getElementById('score-display').innerText;
-    let h = JSON.parse(localStorage.getItem('sn_hist_clean') || "[]");
-    h.unshift({ date: new Date().toLocaleString(), moy: moy });
-    localStorage.setItem('sn_hist_clean', JSON.stringify(h.slice(0,10)));
-    alert("Moyenne sauvegardée dans l'historique !");
+    let h = JSON.parse(localStorage.getItem('sn_moy_hist') || "[]");
+    h.unshift({ date: new Date().toLocaleString('fr-FR'), moy: moy });
+    localStorage.setItem('sn_moy_hist', JSON.stringify(h.slice(0,10)));
+    alert("Sauvegardé !");
 }
 
 function toggleHistory() {
-    const h = JSON.parse(localStorage.getItem('sn_hist_clean') || "[]");
-    document.getElementById('history-list').innerHTML = h.map(i => `<div style="padding:10px; border-bottom:1px solid #eee"><b>${i.moy}</b> <small style="float:right">${i.date}</small></div>`).join('') || "Aucun historique.";
+    const h = JSON.parse(localStorage.getItem('sn_moy_hist') || "[]");
+    document.getElementById('history-list').innerHTML = h.map(i => `<div style="padding:10px; border-bottom:1px solid #eee"><b>${i.moy}</b> <small style="float:right">${i.date}</small></div>`).join('') || "Historique vide.";
     document.getElementById('popup-history').style.display = 'block';
 }
 
-window.onload = () => { 
-    switchSemester(1); 
-    ajouterMatiere("Français", 2); 
-};
+window.onload = () => { ajouterMatiere("Français", 2); };
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('Erreur SW:', err));
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
     });
 }
 </script>
