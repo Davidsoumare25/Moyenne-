@@ -2,68 +2,211 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LABO TEST MOYENNE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sénégal Scolaire OS - Simplifié</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #eee; }
-        .test-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .res { font-size: 2.5rem; color: #00853f; font-weight: bold; text-align: center; margin: 20px 0; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; }
-        label { font-weight: bold; font-size: 0.9rem; color: #555; }
+        :root {
+            --sn-green: #00853f; --sn-yellow: #fdef42; --sn-red: #e31b23;
+            --dock-bg: rgba(255, 255, 255, 0.4); --card-bg: rgba(255, 255, 255, 0.95); --text-color: #000;
+        }
+        .dark-mode {
+            --sn-green: #004d25; --sn-yellow: #b3a700; --sn-red: #8b1116;
+            --dock-bg: rgba(0, 0, 0, 0.6); --card-bg: rgba(30, 30, 30, 0.95); --text-color: #fff;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0;
+            background: linear-gradient(135deg, var(--sn-green), var(--sn-yellow), var(--sn-red));
+            background-attachment: fixed; min-height: 100vh; padding-bottom: 180px; color: var(--text-color); transition: 0.3s;
+        }
+        .app-container { width: 100%; max-width: 450px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
+        .semester-selector { display: flex; background: rgba(0, 0, 0, 0.2); border-radius: 15px; padding: 5px; margin-bottom: 20px; }
+        .sem-btn { flex: 1; padding: 10px; border: none; background: none; color: white; font-weight: bold; border-radius: 12px; cursor: pointer; }
+        .sem-btn.active { background: white; color: #000; }
+        .header-score { text-align: center; color: white; padding: 10px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .header-score h1 { font-size: 4.5rem; margin: 0; font-weight: 900; color: var(--sn-yellow); }
+        .mention-text { font-size: 1.2rem; font-weight: bold; margin-top: 5px; min-height: 1.5em; }
+        .matiere-card { background: var(--card-bg); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .matiere-name { border: none; background: none; font-weight: 800; font-size: 1.1rem; width: 45%; color: var(--text-color); }
+        .coef-box { background: #e2e8f0; padding: 5px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; color: #000; }
+        .coef-box input { width: 30px; border: none; background: none; text-align: center; font-weight: 900; }
+        .notes-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .note-field input { width: 100%; padding: 10px; border-radius: 12px; border: 1.5px solid #cbd5e1; text-align: center; font-weight: 800; box-sizing: border-box; }
+        .iphone-dock {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 92%; max-width: 420px; background: var(--dock-bg); backdrop-filter: blur(25px);
+            border-radius: 40px; padding: 15px; display: flex; justify-content: space-around;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); z-index: 1000; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .dock-app { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; border: none; background: none; }
+        .app-icon { width: 55px; height: 55px; border-radius: 14px; background: white; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .app-label { color: white; font-size: 0.7rem; font-weight: bold; }
+        .ios-popup {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 85%; max-height: 75vh; background: var(--card-bg); border-radius: 30px; padding: 25px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 2000; overflow-y: auto; color: var(--text-color);
+        }
+        .hidden { display: none; }
+        .graph-container { display: none; height: 120px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="test-card">
-        <h2>🔬 Test de Logique</h2>
-        
-        <label>Coefficient :</label>
-        <input type="number" id="coef" value="2" oninput="calculerLive()">
-
-        <label>Devoir 1 :</label>
-        <input type="number" id="d1" placeholder="Note / 20" oninput="calculerLive()">
-
-        <label>Composition :</label>
-        <input type="number" id="comp" placeholder="Note / 20" oninput="calculerLive()">
-
-        <hr>
-        <div class="res" id="resultat">--</div>
-        <p id="debug" style="font-size: 0.8rem; color: gray; text-align: center;"></p>
+<div class="app-container">
+    <div class="semester-selector">
+        <button class="sem-btn active" id="btn-s1" onclick="switchSemester(1)">1er Semestre</button>
+        <button class="sem-btn" id="btn-s2" onclick="switchSemester(2)">2ème Semestre</button>
     </div>
 
-    <script>
-        function calculerLive() {
-            // 1. Récupération des valeurs
-            let c = parseFloat(document.getElementById('coef').value) || 0;
-            let n1 = parseFloat(document.getElementById('d1').value);
-            let nc = parseFloat(document.getElementById('comp').value);
-            
-            let debug = document.getElementById('debug');
-            let affichage = document.getElementById('resultat');
+    <div class="header-score">
+        <h1 id="score-display">0.00</h1>
+        <div class="mention-text" id="mention-display"></div>
+        <div style="font-size:0.8rem; opacity:0.8">Annuel: <span id="moy-annuelle">--</span></div>
+    </div>
 
-            // 2. Sécurité 20/20 (on bloque visuellement)
-            if(n1 > 20) { n1 = 20; document.getElementById('d1').value = 20; }
-            if(nc > 20) { nc = 20; document.getElementById('comp').value = 20; }
+    <div id="container-s1"></div>
+    <div id="container-s2" class="hidden"></div>
 
-            // 3. Logique de calcul
-            if (c > 0 && (!isNaN(n1) || !isNaN(nc))) {
-                let moyenneMatiere = 0;
-                
-                if (!isNaN(n1) && !isNaN(nc)) {
-                    moyenneMatiere = (n1 + nc) / 2;
-                } else {
-                    moyenneMatiere = !isNaN(n1) ? n1 : nc;
-                }
+    <div id="popup-history" class="ios-popup">
+        <h3 style="text-align:center">📜 Historique</h3>
+        <div id="history-list"></div>
+        <button onclick="closePopups()" style="width:100%; padding:15px; margin-top:15px; border-radius:15px; border:none; background:#eee; font-weight:bold;">Fermer</button>
+    </div>
+</div>
 
-                let totalPoints = moyenneMatiere * c;
-                affichage.innerText = moyenneMatiere.toFixed(2);
-                debug.innerText = `Points: ${totalPoints} | Coef: ${c}`;
-            } else {
-                affichage.innerText = "--";
-                debug.innerText = "En attente de notes et coef...";
-            }
-        }
-    </script>
+<div class="iphone-dock">
+    <button class="dock-app" onclick="ajouterMatiere()">
+        <div class="app-icon">➕</div><span class="app-label">Matière</span>
+    </button>
+    <button class="dock-app" onclick="sauvegarderHist()">
+        <div class="app-icon" style="background: #000; color:white;">💾</div><span class="app-label">Sauver</span>
+    </button>
+    <button class="dock-app" onclick="toggleHistory()">
+        <div class="app-icon" style="background: #007aff; color:white;">📜</div><span class="app-label">Hist.</span>
+    </button>
+    <button class="dock-app" onclick="toggleDarkMode()">
+        <div class="app-icon" style="background: #5856d6; color:white;">🌙</div><span class="app-label">Mode</span>
+    </button>
+</div>
+
+<script>
+let currentSem = 1;
+let charts = {};
+
+function switchSemester(sem) {
+    currentSem = sem;
+    document.getElementById('btn-s1').classList.toggle('active', sem === 1);
+    document.getElementById('btn-s2').classList.toggle('active', sem === 2);
+    document.getElementById('container-s1').classList.toggle('hidden', sem === 2);
+    document.getElementById('container-s2').classList.toggle('hidden', sem === 1);
+    calculerSeul();
+}
+
+function ajouterMatiere(nom="", coef=1, d1="", d2="", comp="") {
+    const id = Date.now() + Math.random();
+    const container = document.getElementById(`container-s${currentSem}`);
+    const div = document.createElement('div');
+    div.className = 'matiere-card';
+    div.id = `card-${id}`;
+    div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <input type="text" class="matiere-name" value="${nom}" placeholder="MATIÈRE">
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button style="border:none; background:none; cursor:pointer;" onclick="toggleGraph('${id}')">📈</button>
+                <div class="coef-box">COEF: <input type="number" class="val-coef" value="${coef}" min="1" oninput="calculerSeul()"></div>
+                <span style="color:red; cursor:pointer; font-weight:bold; font-size:1.2rem;" onclick="this.closest('.matiere-card').remove(); calculerSeul();">×</span>
+            </div>
+        </div>
+        <div class="notes-grid">
+            <div class="note-field"><input type="number" class="val-d1" value="${d1}" placeholder="D1" min="0" max="20" oninput="calculerSeul()"></div>
+            <div class="note-field"><input type="number" class="val-d2" value="${d2}" placeholder="D2" min="0" max="20" oninput="calculerSeul()"></div>
+            <div class="note-field"><input type="number" class="val-comp" value="${comp}" placeholder="Comp" min="0" max="20" oninput="calculerSeul()"></div>
+        </div>
+        <div class="graph-container" id="graph-area-${id}"><canvas id="chart-${id}"></canvas></div>`;
+    container.appendChild(div);
+    calculerSeul();
+}
+
+function toggleGraph(id) {
+    const area = document.getElementById(`graph-area-${id}`);
+    area.style.display = (area.style.display === 'block') ? 'none' : 'block';
+    if(area.style.display === 'block') initChart(id);
+}
+
+function initChart(id) {
+    const ctx = document.getElementById(`chart-${id}`).getContext('2d');
+    if (charts[id]) charts[id].destroy();
+    const card = document.getElementById(`card-${id}`);
+    const d1 = parseFloat(card.querySelector('.val-d1').value)||0;
+    const d2 = parseFloat(card.querySelector('.val-d2').value)||0;
+    const comp = parseFloat(card.querySelector('.val-comp').value)||0;
+    charts[id] = new Chart(ctx, {
+        type: 'line',
+        data: { labels: ['D1', 'D2', 'Comp'], datasets: [{ data: [d1, d2, comp], borderColor: '#00853f', tension: 0.4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 20 } } }
+    });
+}
+
+function updateChart(id) { if (charts[id]) { initChart(id); } }
+
+function getMoyenneSemestre(sem) {
+    const cards = document.querySelectorAll(`#container-s${sem} .matiere-card`);
+    let total = 0;
+    let sommeCoef = 0;
+    cards.forEach(card => {
+        const d1 = parseFloat(card.querySelector('.val-d1').value) || 0;
+        const d2 = parseFloat(card.querySelector('.val-d2').value) || 0;
+        const comp = parseFloat(card.querySelector('.val-comp').value) || 0;
+        const coef = parseFloat(card.querySelector('.val-coef').value) || 1;
+
+        const moyenneMatiere = (d1 + d2 + comp)/3; // moyenne simple des notes
+        total += moyenneMatiere * coef;
+        sommeCoef += coef;
+    });
+    return sommeCoef > 0 ? (total / sommeCoef) : 0;
+}
+
+function calculerSeul() {
+    const moy = getMoyenneSemestre(currentSem);
+    document.getElementById('score-display').innerText = moy.toFixed(2);
+    
+    const disp = document.getElementById('mention-display');
+    if(moy >= 16) disp.innerText = "🌟 Félicitations !";
+    else if(moy >= 14) disp.innerText = "👏 Très Bien";
+    else if(moy >= 12) disp.innerText = "👍 Assez Bien";
+    else if(moy >= 10) disp.innerText = "🎯 Admis";
+    else disp.innerText = "";
+
+    const s1 = getMoyenneSemestre(1);
+    const s2 = getMoyenneSemestre(2);
+    if(s1 > 0 && s2 > 0) document.getElementById('moy-annuelle').innerText = ((s1+s2)/2).toFixed(2);
+    else document.getElementById('moy-annuelle').innerText = "--";
+}
+
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+function closePopups() { document.querySelectorAll('.ios-popup').forEach(p => p.style.display='none'); }
+
+function sauvegarderHist() {
+    const moy = document.getElementById('score-display').innerText;
+    let h = JSON.parse(localStorage.getItem('sn_hist_clean') || "[]");
+    h.unshift({ date: new Date().toLocaleString(), moy: moy });
+    localStorage.setItem('sn_hist_clean', JSON.stringify(h.slice(0,10)));
+    alert("Sauvegardé !");
+}
+
+function toggleHistory() {
+    const h = JSON.parse(localStorage.getItem('sn_hist_clean') || "[]");
+    document.getElementById('history-list').innerHTML = h.map(i => `<div style="padding:10px; border-bottom:1px solid #eee"><b>${i.moy}</b> <small style="float:right">${i.date}</small></div>`).join('') || "Vide";
+    document.getElementById('popup-history').style.display = 'block';
+}
+
+window.onload = () => { 
+    switchSemester(1); 
+    ajouterMatiere("Français", 2); 
+    switchSemester(2); 
+    ajouterMatiere("Maths", 3); 
+    switchSemester(1); 
+};
+</script>
 </body>
 </html>
-
