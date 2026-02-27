@@ -257,6 +257,19 @@ window.addEventListener('appinstalled', () => {
 if (window.matchMedia('(display-mode: standalone)').matches) {
     installBtn.style.display = 'none';
 }
+    <script>
+        // Place le code ici
+        function toggleAbout() {
+            const modal = document.getElementById('about-modal');
+            if (modal.style.display === 'none' || modal.style.display === '') {
+                modal.style.display = 'flex';
+            } else {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
 
 </script>
 </body>
