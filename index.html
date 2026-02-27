@@ -110,7 +110,12 @@
     </a>
     <button class="dock-app" onclick="toggleDarkMode()">
         <div class="app-icon" style="background: #5856d6; color:white;">🌙</div><span class="app-label">Mode</span>
-    </button>
+       </button>
+<button id="install-btn" class="dock-app" style="display: none; background: #007aff; border-radius: 15px; padding: 5px;">
+    <div class="app-icon" style="background: transparent;">📲</div>
+    <span class="app-label">Installer</span>
+</button>
+
 </div>
 
 <script>
@@ -215,6 +220,44 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
     });
 }
+let deferredPrompt;
+const installBtn = document.getElementById('install-btn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Empêche Chrome d'afficher sa propre bannière automatique
+    e.preventDefault();
+    // Stocke l'événement pour l'utiliser plus tard
+    deferredPrompt = e;
+    // Affiche ton bouton personnalisé
+    installBtn.style.display = 'flex';
+});
+
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        // Montre la fenêtre d'installation officielle
+        deferredPrompt.prompt();
+        // Attend la réponse de l'utilisateur
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('L’utilisateur a installé l’app');
+        }
+        // Cache le bouton car il ne servira plus
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
+    }
+});
+
+// Cache aussi le bouton si l'app est déjà installée (mode standalone)
+window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    console.log('App installée avec succès !');
+});
+
+// Vérification au chargement : si on est déjà dans l'app installée, on cache le bouton
+if (window.matchMedia('(display-mode: standalone)').matches) {
+    installBtn.style.display = 'none';
+}
+
 </script>
 </body>
 </html>
