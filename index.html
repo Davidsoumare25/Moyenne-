@@ -40,7 +40,6 @@
         .notes-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .note-field input { width: 100%; padding: 10px; border-radius: 12px; border: 1.5px solid #cbd5e1; text-align: center; font-weight: 800; box-sizing: border-box; }
         
-        /* Bannière Publicitaire */
         .ad-banner { text-align: center; margin: 15px 0; min-height: 50px; }
 
         .iphone-dock {
@@ -58,6 +57,13 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 2000; overflow-y: auto; color: var(--text-color);
         }
         .hidden { display: none; }
+
+        /* Style À Propos */
+        #about-modal {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.8); z-index:3000; justify-content:center; align-items:center; 
+            backdrop-filter: blur(5px);
+        }
     </style>
 </head>
 <body>
@@ -80,9 +86,7 @@
              style="display:inline-block;width:320px;height:50px"
              data-ad-client="ca-pub-2847151888169934"
              data-ad-slot="7751303675"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
+        <script> (adsbygoogle = window.adsbygoogle || []).push({}); </script>
     </div>
 
     <div id="container-s1"></div>
@@ -95,6 +99,18 @@
     </div>
 </div>
 
+<div id="about-modal">
+    <div style="background:var(--card-bg); color:var(--text-color); padding:25px; border-radius:30px; width:85%; max-width:400px; text-align:center; position:relative;">
+        <span onclick="toggleAbout()" style="position:absolute; top:15px; right:20px; font-size:28px; cursor:pointer;">&times;</span>
+        <h2 style="margin-top:0; color:var(--sn-green);">À propos</h2>
+        <p><strong>Moyenne</strong> est un outil gratuit pour les élèves du Sénégal.</p>
+        <p>Calculez vos notes (D1, D2, Compo) en un clic.</p>
+        <hr style="opacity:0.2; margin:20px 0;">
+        <p style="font-size:0.9rem; font-weight:bold;">Version 1.0</p>
+        <p style="font-size:0.8rem; opacity:0.7;">Objectif : Financer mon matériel de travail. ❤️</p>
+    </div>
+</div>
+
 <div class="iphone-dock">
     <button class="dock-app" onclick="ajouterMatiere()">
         <div class="app-icon">➕</div><span class="app-label">Matière</span>
@@ -102,20 +118,15 @@
     <button class="dock-app" onclick="sauvegarderHist()">
         <div class="app-icon" style="background: #000; color:white;">💾</div><span class="app-label">Sauver</span>
     </button>
-    <button class="dock-app" onclick="toggleHistory()">
-        <div class="app-icon" style="background: #007aff; color:white;">📜</div><span class="app-label">Hist.</span>
+    <button class="dock-app" onclick="toggleAbout()">
+        <div class="app-icon" style="background: #8e8e93; color:white;">ℹ️</div><span class="app-label">Infos</span>
     </button>
-    <a href="soutien.html" class="dock-app">
-        <div class="app-icon" style="background: #ffcc00; color:black;">❤️</div><span class="app-label">Soutenir</span>
-    </a>
+    <button class="dock-app" id="install-btn" style="display:none;">
+        <div class="app-icon" style="background: #007aff; color:white;">📲</div><span class="app-label">Installer</span>
+    </button>
     <button class="dock-app" onclick="toggleDarkMode()">
         <div class="app-icon" style="background: #5856d6; color:white;">🌙</div><span class="app-label">Mode</span>
-       </button>
-<button id="install-btn" class="dock-app" style="display: none; background: #007aff; border-radius: 15px; padding: 5px;">
-    <div class="app-icon" style="background: transparent;">📲</div>
-    <span class="app-label">Installer</span>
-</button>
-
+    </button>
 </div>
 
 <script>
@@ -153,32 +164,24 @@ function ajouterMatiere(nom="", coef=1, d1="", d2="", comp="") {
     calculerSeul();
 }
 
-// LOGIQUE SÉNÉGALAISE : ((D1+D2)/2 + COMP) / 2
 function getMoyenneSemestre(sem) {
     const cards = document.querySelectorAll(`#container-s${sem} .matiere-card`);
-    let cumulPoints = 0;
-    let totalCoefs = 0;
-
+    let cumulPoints = 0; let totalCoefs = 0;
     cards.forEach(card => {
         const d1 = parseFloat(card.querySelector('.val-d1').value) || 0;
         const d2 = parseFloat(card.querySelector('.val-d2').value) || 0;
         const comp = parseFloat(card.querySelector('.val-comp').value) || 0;
         const coef = parseFloat(card.querySelector('.val-coef').value) || 1;
-
-        const moyDevoirs = (d1 + d2) / 2;
-        const moyMatiere = (moyDevoirs + comp) / 2;
-
+        const moyMatiere = (((d1 + d2) / 2) + comp) / 2;
         cumulPoints += (moyMatiere * coef);
         totalCoefs += coef;
     });
-
     return totalCoefs > 0 ? (cumulPoints / totalCoefs) : 0;
 }
 
 function calculerSeul() {
     const moy = getMoyenneSemestre(currentSem);
     document.getElementById('score-display').innerText = moy.toFixed(2);
-    
     const disp = document.getElementById('mention-display');
     if(moy >= 16) disp.innerText = "🌟 Félicitations !";
     else if(moy >= 14) disp.innerText = "👏 Très Bien";
@@ -189,15 +192,15 @@ function calculerSeul() {
 
     const s1 = getMoyenneSemestre(1);
     const s2 = getMoyenneSemestre(2);
-    if(s1 > 0 && s2 > 0) {
-        document.getElementById('moy-annuelle').innerText = ((s1 + s2) / 2).toFixed(2);
-    } else {
-        document.getElementById('moy-annuelle').innerText = "--";
-    }
+    document.getElementById('moy-annuelle').innerText = (s1 > 0 && s2 > 0) ? ((s1 + s2) / 2).toFixed(2) : "--";
 }
 
 function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
-function closePopups() { document.querySelectorAll('.ios-popup').forEach(p => p.style.display='none'); }
+function closePopups() { document.querySelectorAll('.ios-popup, #about-modal').forEach(p => p.style.display='none'); }
+function toggleAbout() { 
+    const m = document.getElementById('about-modal');
+    m.style.display = (m.style.display === 'none' || m.style.display === '') ? 'flex' : 'none';
+}
 
 function sauvegarderHist() {
     const moy = document.getElementById('score-display').innerText;
@@ -213,65 +216,27 @@ function toggleHistory() {
     document.getElementById('popup-history').style.display = 'block';
 }
 
-window.onload = () => { ajouterMatiere("Français", 2); };
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
-    });
-}
 let deferredPrompt;
-const installBtn = document.getElementById('install-btn');
-
 window.addEventListener('beforeinstallprompt', (e) => {
-    // Empêche Chrome d'afficher sa propre bannière automatique
-    e.preventDefault();
-    // Stocke l'événement pour l'utiliser plus tard
-    deferredPrompt = e;
-    // Affiche ton bouton personnalisé
-    installBtn.style.display = 'flex';
+    e.preventDefault(); deferredPrompt = e;
+    document.getElementById('install-btn').style.display = 'flex';
 });
 
-installBtn.addEventListener('click', async () => {
+document.getElementById('install-btn').addEventListener('click', async () => {
     if (deferredPrompt) {
-        // Montre la fenêtre d'installation officielle
         deferredPrompt.prompt();
-        // Attend la réponse de l'utilisateur
         const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            console.log('L’utilisateur a installé l’app');
-        }
-        // Cache le bouton car il ne servira plus
+        if (outcome === 'accepted') document.getElementById('install-btn').style.display = 'none';
         deferredPrompt = null;
-        installBtn.style.display = 'none';
     }
 });
 
-// Cache aussi le bouton si l'app est déjà installée (mode standalone)
-window.addEventListener('appinstalled', () => {
-    installBtn.style.display = 'none';
-    console.log('App installée avec succès !');
-});
-
-// Vérification au chargement : si on est déjà dans l'app installée, on cache le bouton
-if (window.matchMedia('(display-mode: standalone)').matches) {
-    installBtn.style.display = 'none';
-}
-    <script>
-        // Place le code ici
-        function toggleAbout() {
-            const modal = document.getElementById('about-modal');
-            if (modal.style.display === 'none' || modal.style.display === '') {
-                modal.style.display = 'flex';
-            } else {
-                modal.style.display = 'none';
-            }
-        }
-    </script>
-</body>
-</html>
-
+window.onload = () => { 
+    ajouterMatiere("Français", 2); 
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
+    }
+};
 </script>
 </body>
 </html>
-
